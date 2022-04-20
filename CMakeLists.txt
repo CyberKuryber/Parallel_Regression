@@ -13,7 +13,7 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Parallel_regression main.cpp)
+add_executable(Parallel_regression main.cpp Point.cpp Point.h InputHandler.cpp InputHandler.h SerialLinearRegression.cpp SerialLinearRegression.h)
 target_link_libraries(Parallel_regression
         Qt5::Core
         Qt5::Gui
