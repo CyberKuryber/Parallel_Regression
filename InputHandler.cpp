@@ -36,15 +36,18 @@ struct Shaker {
             points.push_back(Point(new_x, new_y));
         }
     }
-    Shaker(double a,double  b, double increment, double x_error, double y_error): a(a), b(b), increment(increment), x_error(x_error), y_error(y_error){};
+
+    Shaker(double a, double b, double increment, double x_error, double y_error) : a(a), b(b), increment(increment),
+                                                                                   x_error(x_error),
+                                                                                   y_error(y_error) {};
 };
 
 
 tbb::concurrent_vector<Point>
 InputHandler::generate_dots(double x_min, double x_max, double x_error, double y_error, int point_count) {
-    Shaker shaker(a,b,x_max-x_min,x_error,y_error);
+    Shaker shaker(a, b, x_max - x_min, x_error, y_error);
 
-    tbb::parallel_for(tbb::blocked_range<int>(0,point_count),shaker);
+    tbb::parallel_for(tbb::blocked_range<int>(0, point_count), shaker);
     return points;
 
 }

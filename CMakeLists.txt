@@ -6,6 +6,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+file(GLOB SOURCES
+        *.h
+        *.cpp
+        )
 
 find_package(Qt5 COMPONENTS
         Core
@@ -13,7 +17,7 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Parallel_regression main.cpp Point.cpp Point.h InputHandler.cpp InputHandler.h SerialLinearRegression.cpp SerialLinearRegression.h MainWindow.cpp MainWindow.h)
+add_executable(Parallel_regression main.cpp Point.cpp Point.h InputHandler.cpp InputHandler.h SerialLinearRegression.cpp SerialLinearRegression.h MainWindow.cpp MainWindow.h qcustomplot.cpp qcustomplot.h)
 target_link_libraries(Parallel_regression
         Qt5::Core
         Qt5::Gui

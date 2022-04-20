@@ -12,10 +12,14 @@ private:
     double y;
 public:
     double get_x() const;
+
     double set_x(double x);
+
     double get_y() const;
+
     double set_y(double y);
-    Point(double x,double y): x(x),y(y) {};
+
+    Point(double x, double y) : x(x), y(y) {};
 };
 
 

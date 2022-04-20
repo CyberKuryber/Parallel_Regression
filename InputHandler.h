@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 #include "time.h"
+
 #define INPUT_FILE "input_file"
 
 class InputHandler {
@@ -21,7 +22,8 @@ private:
     double b;
 public:
     void parse_input();
-    tbb::concurrent_vector<Point> generate_dots(double x_min,double x_max, double x_error, double y_error, int ponts);
+
+    tbb::concurrent_vector<Point> generate_dots(double x_min, double x_max, double x_error, double y_error, int ponts);
 
 };
 

@@ -4,6 +4,7 @@
 
 #ifndef PARALLEL_REGRESSION_MAINWINDOW_H
 #define PARALLEL_REGRESSION_MAINWINDOW_H
+
 #include "QMainWindow"
 #include "QPushButton"
 #include "QString"
@@ -11,10 +12,10 @@
 #include "QSpinBox"
 #include "QLabel"
 
-class MainWindow: public QMainWindow {
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+Q_OBJECT
 public:
-     MainWindow(const QString &title);
+    MainWindow(const QString &title);
 //     ~MainWindow();
 
 private:

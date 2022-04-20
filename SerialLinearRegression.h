@@ -11,12 +11,13 @@
 
 class SerialLinearRegression {
 public:
-    void calculate_Function(std::vector<Point>& points);
-    std::vector<Point> calculate_points(std::vector<double>& x);
+    void calculate_Function(std::vector<Point> &points);
+
+    std::vector<Point> calculate_points(std::vector<double> &x);
+
 private:
     double a;
     double b;
-
 
 
 };

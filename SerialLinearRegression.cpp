@@ -4,7 +4,7 @@
 
 #include "SerialLinearRegression.h"
 
-void SerialLinearRegression::calculate_Function(std::vector<Point>& points) {
+void SerialLinearRegression::calculate_Function(std::vector<Point> &points) {
     double x_sum = 0, x2_sum = 0, y_sum = 0, x_ysum = 0;
     int n = points.size();
     for (int i = 0; i < n; i++) {
@@ -18,13 +18,12 @@ void SerialLinearRegression::calculate_Function(std::vector<Point>& points) {
     this->b = (x2_sum * y_sum - x_sum * x_ysum) / (x2_sum * n - x_sum * x_sum);
 
 
-
 }
 
 std::vector<Point> SerialLinearRegression::calculate_points(std::vector<double> &x) {
     std::vector<Point> y;
-    for (auto value:x) {
-        y.push_back(Point(value, a*value+b));
+    for (auto value: x) {
+        y.push_back(Point(value, a * value + b));
     }
     return y;
 }
