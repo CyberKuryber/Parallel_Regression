@@ -18,5 +18,10 @@ target_link_libraries(Parallel_regression
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
+        TBB::tbb
         )
+
+list(APPEND CMAKE_MODULE_PATH "deps/tbb/cmake/")
+
+find_package(TBB REQUIRED)
 
