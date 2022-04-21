@@ -1142,7 +1142,7 @@ void QCPLayer::setMode(QCPLayer::LayerMode mode)
 */
 void QCPLayer::draw(QCPPainter *painter)
 {
-  foreach (QCPLayerable *child, mChildren)
+  Q_FOREACH (QCPLayerable *child, mChildren)
   {
     if (child->realVisibility())
     {
@@ -1331,17 +1331,17 @@ void QCPLayer::removeChild(QCPLayerable *layerable)
 */
 
 /* end documentation of pure virtual functions */
-/* start documentation of signals */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPLayerable::layerChanged(QCPLayer *newLayer);
   
-  This signal is emitted when the layer of this layerable changes, i.e. this layerable is moved to
+  This signal is Q_EMITted when the layer of this layerable changes, i.e. this layerable is moved to
   a different layer.
   
   \see setLayer
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*!
   Creates a new QCPLayerable instance.
@@ -1584,7 +1584,7 @@ bool QCPLayerable::moveToLayer(QCPLayer *layer, bool prepend)
   if (mLayer)
     mLayer->addChild(this, prepend);
   if (mLayer != oldLayer)
-    emit layerChanged(mLayer);
+    Q_EMIT layerChanged(mLayer);
   return true;
 }
 
@@ -2528,7 +2528,7 @@ QCPDataSelection &QCPDataSelection::operator-=(const QCPDataRange &other)
 int QCPDataSelection::dataPointCount() const
 {
   int result = 0;
-  foreach (QCPDataRange dataRange, mDataRanges)
+  Q_FOREACH (QCPDataRange dataRange, mDataRanges)
     result += dataRange.length();
   return result;
 }
@@ -2708,7 +2708,7 @@ bool QCPDataSelection::contains(const QCPDataSelection &other) const
 QCPDataSelection QCPDataSelection::intersection(const QCPDataRange &other) const
 {
   QCPDataSelection result;
-  foreach (QCPDataRange dataRange, mDataRanges)
+  Q_FOREACH (QCPDataRange dataRange, mDataRanges)
     result.addDataRange(dataRange.intersection(other), false);
   result.simplify();
   return result;
@@ -2772,7 +2772,7 @@ QCPDataSelection QCPDataSelection::inverse(const QCPDataRange &outerRange) const
   \ref QCP::srmNone. When the user drags the mouse across the plot, the current selection rect
   instance (\ref QCustomPlot::setSelectionRect) is forwarded these events and makes sure an
   according rect shape is drawn. At the begin, during, and after completion of the interaction, it
-  emits the corresponding signals \ref started, \ref changed, \ref canceled, and \ref accepted.
+  Q_EMITs the corresponding Q_SIGNALS \ref started, \ref changed, \ref canceled, and \ref accepted.
   
   The QCustomPlot instance connects own slots to the current selection rect instance, in order to
   react to an accepted selection rect interaction accordingly.
@@ -2798,17 +2798,17 @@ QCPDataSelection QCPDataSelection::inverse(const QCPDataRange &outerRange) const
 */
 
 /* end of documentation of inline functions */
-/* start documentation of signals */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPSelectionRect::started(QMouseEvent *event);
    
-  This signal is emitted when a selection rect interaction was initiated, i.e. the user just
+  This signal is Q_EMITted when a selection rect interaction was initiated, i.e. the user just
   started dragging the selection rect with the mouse.
 */
 
 /*! \fn void QCPSelectionRect::changed(const QRect &rect, QMouseEvent *event);
   
-  This signal is emitted while the selection rect interaction is ongoing and the \a rect has
+  This signal is Q_EMITted while the selection rect interaction is ongoing and the \a rect has
   changed its size due to the user moving the mouse.
   
   Note that \a rect may have a negative width or height, if the selection is being dragged to the
@@ -2817,7 +2817,7 @@ QCPDataSelection QCPDataSelection::inverse(const QCPDataRange &outerRange) const
 
 /*! \fn void QCPSelectionRect::canceled(const QRect &rect, QInputEvent *event);
   
-  This signal is emitted when the selection interaction was cancelled. Note that \a event is \c
+  This signal is Q_EMITted when the selection interaction was cancelled. Note that \a event is \c
   nullptr if the selection interaction was cancelled programmatically, by a call to \ref cancel.
   
   The user may cancel the selection interaction by pressing the escape key. In this case, \a event
@@ -2829,14 +2829,14 @@ QCPDataSelection QCPDataSelection::inverse(const QCPDataRange &outerRange) const
 
 /*! \fn void QCPSelectionRect::accepted(const QRect &rect, QMouseEvent *event);
   
-  This signal is emitted when the selection interaction was completed by the user releasing the
+  This signal is Q_EMITted when the selection interaction was completed by the user releasing the
   mouse button.
     
   Note that \a rect may have a negative width or height, if the selection is being dragged to the
   upper or left side of the selection rect origin.
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*!
   Creates a new QCPSelectionRect instance. To make QCustomPlot use the selection rect instance,
@@ -2898,14 +2898,14 @@ void QCPSelectionRect::setBrush(const QBrush &brush)
 
 /*!
   If there is currently a selection interaction going on (\ref isActive), the interaction is
-  canceled. The selection rect will emit the \ref canceled signal.
+  canceled. The selection rect will Q_EMIT the \ref canceled signal.
 */
 void QCPSelectionRect::cancel()
 {
   if (mActive)
   {
     mActive = false;
-    emit canceled(mRect, nullptr);
+    Q_EMIT canceled(mRect, nullptr);
   }
 }
 
@@ -2913,25 +2913,25 @@ void QCPSelectionRect::cancel()
   
   This method is called by QCustomPlot to indicate that a selection rect interaction was initiated.
   The default implementation sets the selection rect to active, initializes the selection rect
-  geometry and emits the \ref started signal.
+  geometry and Q_EMITs the \ref started signal.
 */
 void QCPSelectionRect::startSelection(QMouseEvent *event)
 {
   mActive = true;
   mRect = QRect(event->pos(), event->pos());
-  emit started(event);
+  Q_EMIT started(event);
 }
 
 /*! \internal
   
   This method is called by QCustomPlot to indicate that an ongoing selection rect interaction needs
-  to update its geometry. The default implementation updates the rect and emits the \ref changed
+  to update its geometry. The default implementation updates the rect and Q_EMITs the \ref changed
   signal.
 */
 void QCPSelectionRect::moveSelection(QMouseEvent *event)
 {
   mRect.setBottomRight(event->pos());
-  emit changed(mRect, event);
+  Q_EMIT changed(mRect, event);
   layer()->replot();
 }
 
@@ -2939,13 +2939,13 @@ void QCPSelectionRect::moveSelection(QMouseEvent *event)
   
   This method is called by QCustomPlot to indicate that an ongoing selection rect interaction has
   finished by the user releasing the mouse button. The default implementation deactivates the
-  selection rect and emits the \ref accepted signal.
+  selection rect and Q_EMITs the \ref accepted signal.
 */
 void QCPSelectionRect::endSelection(QMouseEvent *event)
 {
   mRect.setBottomRight(event->pos());
   mActive = false;
-  emit accepted(mRect, event);
+  Q_EMIT accepted(mRect, event);
 }
 
 /*! \internal
@@ -2959,7 +2959,7 @@ void QCPSelectionRect::keyPressEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Escape && mActive)
   {
     mActive = false;
-    emit canceled(mRect, event);
+    Q_EMIT canceled(mRect, event);
   }
 }
 
@@ -3100,7 +3100,7 @@ int QCPMarginGroup::commonMargin(QCP::MarginSide side) const
 {
   // query all automatic margins of the layout elements in this margin group side and find maximum:
   int result = 0;
-  foreach (QCPLayoutElement *el, mChildren.value(side))
+  Q_FOREACH (QCPLayoutElement *el, mChildren.value(side))
   {
     if (!el->autoMargins().testFlag(side))
       continue;
@@ -3401,7 +3401,7 @@ void QCPLayoutElement::setMarginGroup(QCP::MarginSides sides, QCPMarginGroup *gr
   if (sides.testFlag(QCP::msTop)) sideVector.append(QCP::msTop);
   if (sides.testFlag(QCP::msBottom)) sideVector.append(QCP::msBottom);
   
-  foreach (QCP::MarginSide side, sideVector)
+  Q_FOREACH (QCP::MarginSide side, sideVector)
   {
     if (marginGroup(side) != group)
     {
@@ -3442,7 +3442,7 @@ void QCPLayoutElement::update(UpdatePhase phase)
       // set the margins of this layout element according to automatic margin calculation, either directly or via a margin group:
       QMargins newMargins = mMargins;
       const QList<QCP::MarginSide> allMarginSides = QList<QCP::MarginSide>() << QCP::msLeft << QCP::msRight << QCP::msTop << QCP::msBottom;
-      foreach (QCP::MarginSide side, allMarginSides)
+      Q_FOREACH (QCP::MarginSide side, allMarginSides)
       {
         if (mAutoMargins.testFlag(side)) // this side's margin shall be calculated automatically
         {
@@ -3549,7 +3549,7 @@ double QCPLayoutElement::selectTest(const QPointF &pos, bool onlySelectable, QVa
 */
 void QCPLayoutElement::parentPlotInitialized(QCustomPlot *parentPlot)
 {
-  foreach (QCPLayoutElement *el, elements(false))
+  Q_FOREACH (QCPLayoutElement *el, elements(false))
   {
     if (!el->parentPlot())
       el->initializeParentPlot(parentPlot);
@@ -3935,7 +3935,7 @@ QVector<int> QCPLayout::getSectionSizes(QVector<int> maxSizes, QVector<int> minS
       // find section that hits its maximum next:
       int nextId = -1;
       double nextMax = 1e12;
-      foreach (int secId, unfinishedSections)
+      Q_FOREACH (int secId, unfinishedSections)
       {
         double hitsMaxAt = (maxSizes.at(secId)-sectionSizes.at(secId))/stretchFactors.at(secId);
         if (hitsMaxAt < nextMax)
@@ -3947,12 +3947,12 @@ QVector<int> QCPLayout::getSectionSizes(QVector<int> maxSizes, QVector<int> minS
       // check if that maximum is actually within the bounds of the total size (i.e. can we stretch all remaining sections so far that the found section
       // actually hits its maximum, without exceeding the total size when we add up all sections)
       double stretchFactorSum = 0;
-      foreach (int secId, unfinishedSections)
+      Q_FOREACH (int secId, unfinishedSections)
         stretchFactorSum += stretchFactors.at(secId);
       double nextMaxLimit = freeSize/stretchFactorSum;
       if (nextMax < nextMaxLimit) // next maximum is actually hit, move forward to that point and fix the size of that section
       {
-        foreach (int secId, unfinishedSections)
+        Q_FOREACH (int secId, unfinishedSections)
         {
           sectionSizes[secId] += nextMax*stretchFactors.at(secId); // increment all sections
           freeSize -= nextMax*stretchFactors.at(secId);
@@ -3960,7 +3960,7 @@ QVector<int> QCPLayout::getSectionSizes(QVector<int> maxSizes, QVector<int> minS
         unfinishedSections.removeOne(nextId); // exclude the section that is now at maximum from further changes
       } else // next maximum isn't hit, just distribute rest of free space on remaining sections
       {
-        foreach (int secId, unfinishedSections)
+        Q_FOREACH (int secId, unfinishedSections)
           sectionSizes[secId] += nextMaxLimit*stretchFactors.at(secId); // increment all sections
         unfinishedSections.clear();
       }
@@ -3992,7 +3992,7 @@ QVector<int> QCPLayout::getSectionSizes(QVector<int> maxSizes, QVector<int> minS
           freeSize -= sectionSizes.at(i); // remove size of minimum locked sections from available space in next round
       }
       // reset all section sizes to zero that are in unfinished sections (all others have been set to their minimum):
-      foreach (int secId, unfinishedSections)
+      Q_FOREACH (int secId, unfinishedSections)
         sectionSizes[secId] = 0;
     }
   }
@@ -4419,7 +4419,7 @@ void QCPLayoutGrid::setFillOrder(FillOrder order, bool rearrange)
   // if rearranging, re-insert via linear index according to new fill order:
   if (rearrange)
   {
-    foreach (QCPLayoutElement *tempElement, tempElements)
+    Q_FOREACH (QCPLayoutElement *tempElement, tempElements)
       addElement(tempElement);
   }
 }
@@ -4750,9 +4750,9 @@ QSize QCPLayoutGrid::minimumOuterSizeHint() const
   QVector<int> minColWidths, minRowHeights;
   getMinimumRowColSizes(&minColWidths, &minRowHeights);
   QSize result(0, 0);
-  foreach (int w, minColWidths)
+  Q_FOREACH (int w, minColWidths)
     result.rwidth() += w;
-  foreach (int h, minRowHeights)
+  Q_FOREACH (int h, minRowHeights)
     result.rheight() += h;
   result.rwidth() += qMax(0, columnCount()-1) * mColumnSpacing;
   result.rheight() += qMax(0, rowCount()-1) * mRowSpacing;
@@ -4768,9 +4768,9 @@ QSize QCPLayoutGrid::maximumOuterSizeHint() const
   getMaximumRowColSizes(&maxColWidths, &maxRowHeights);
   
   QSize result(0, 0);
-  foreach (int w, maxColWidths)
+  Q_FOREACH (int w, maxColWidths)
     result.setWidth(qMin(result.width()+w, QWIDGETSIZE_MAX));
-  foreach (int h, maxRowHeights)
+  Q_FOREACH (int h, maxRowHeights)
     result.setHeight(qMin(result.height()+h, QWIDGETSIZE_MAX));
   result.rwidth() += qMax(0, columnCount()-1) * mColumnSpacing;
   result.rheight() += qMax(0, rowCount()-1) * mRowSpacing;
@@ -5096,7 +5096,7 @@ double QCPLayoutInset::selectTest(const QPointF &pos, bool onlySelectable, QVari
   if (onlySelectable)
     return -1;
   
-  foreach (QCPLayoutElement *el, mElements)
+  Q_FOREACH (QCPLayoutElement *el, mElements)
   {
     // inset layout shall only return positive selectTest, if actually an inset object is at pos
     // else it would block the entire underlying QCPAxisRect with its surface.
@@ -6362,7 +6362,7 @@ QVector<QString> QCPAxisTicker::createLabelVector(const QVector<double> &ticks, 
 {
   QVector<QString> result;
   result.reserve(ticks.size());
-  foreach (double tickCoord, ticks)
+  Q_FOREACH (double tickCoord, ticks)
     result.append(getTickLabel(tickCoord, locale, formatChar, precision));
   return result;
 }
@@ -8043,14 +8043,14 @@ void QCPGrid::drawSubGridLines(QCPPainter *painter) const
   painter->setPen(mSubGridPen);
   if (mParentAxis->orientation() == Qt::Horizontal)
   {
-    foreach (double tickCoord, mParentAxis->mSubTickVector)
+    Q_FOREACH (double tickCoord, mParentAxis->mSubTickVector)
     {
       t = mParentAxis->coordToPixel(tickCoord); // x
       painter->drawLine(QLineF(t, mParentAxis->mAxisRect->bottom(), t, mParentAxis->mAxisRect->top()));
     }
   } else
   {
-    foreach (double tickCoord, mParentAxis->mSubTickVector)
+    Q_FOREACH (double tickCoord, mParentAxis->mSubTickVector)
     {
       t = mParentAxis->coordToPixel(tickCoord); // y
       painter->drawLine(QLineF(mParentAxis->mAxisRect->left(), t, mParentAxis->mAxisRect->right(), t));
@@ -8144,11 +8144,11 @@ void QCPGrid::drawSubGridLines(QCPPainter *painter) const
 */
 
 /* end of documentation of inline functions */
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCPAxis::rangeChanged(const QCPRange &newRange)
 
-  This signal is emitted when the range of this axis has changed. You can connect it to the \ref
+  This signal is Q_EMITted when the range of this axis has changed. You can connect it to the \ref
   setRange slot of another axis to communicate the new range to the other axis, in order for it to
   be synchronized.
   
@@ -8170,21 +8170,21 @@ void QCPGrid::drawSubGridLines(QCPPainter *painter) const
 
 /*! \fn void QCPAxis::scaleTypeChanged(QCPAxis::ScaleType scaleType);
   
-  This signal is emitted when the scale type changes, by calls to \ref setScaleType
+  This signal is Q_EMITted when the scale type changes, by calls to \ref setScaleType
 */
 
 /*! \fn void QCPAxis::selectionChanged(QCPAxis::SelectableParts selection)
   
-  This signal is emitted when the selection state of this axis has changed, either by user interaction
+  This signal is Q_EMITted when the selection state of this axis has changed, either by user interaction
   or by a direct call to \ref setSelectedParts.
 */
 
 /*! \fn void QCPAxis::selectableChanged(const QCPAxis::SelectableParts &parts);
   
-  This signal is emitted when the selectability changes, by calls to \ref setSelectableParts
+  This signal is Q_EMITted when the selectability changes, by calls to \ref setSelectableParts
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 
 /*!
   Constructs an Axis instance of Type \a type for the axis rect \a parent.
@@ -8370,7 +8370,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
     if (mScaleType == stLogarithmic)
       setRange(mRange.sanitizedForLogScale());
     mCachedMarginValid = false;
-    emit scaleTypeChanged(mScaleType);
+    Q_EMIT scaleTypeChanged(mScaleType);
   }
 }
 
@@ -8396,8 +8396,8 @@ void QCPAxis::setRange(const QCPRange &range)
   {
     mRange = range.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -8415,7 +8415,7 @@ void QCPAxis::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    emit selectableChanged(mSelectableParts);
+    Q_EMIT selectableChanged(mSelectableParts);
   }
 }
 
@@ -8429,7 +8429,7 @@ void QCPAxis::setSelectableParts(const SelectableParts &selectable)
   
   This function can change the selection state of a part, independent of the \ref setSelectableParts setting.
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see SelectablePart, setSelectableParts, selectTest, setSelectedBasePen, setSelectedTickPen, setSelectedSubTickPen,
   setSelectedTickLabelFont, setSelectedLabelFont, setSelectedTickLabelColor, setSelectedLabelColor
@@ -8439,7 +8439,7 @@ void QCPAxis::setSelectedParts(const SelectableParts &selected)
   if (mSelectedParts != selected)
   {
     mSelectedParts = selected;
-    emit selectionChanged(mSelectedParts);
+    Q_EMIT selectionChanged(mSelectedParts);
   }
 }
 
@@ -8468,8 +8468,8 @@ void QCPAxis::setRange(double lower, double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -8511,8 +8511,8 @@ void QCPAxis::setRangeLower(double lower)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -8533,8 +8533,8 @@ void QCPAxis::setRangeUpper(double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -9120,8 +9120,8 @@ void QCPAxis::moveRange(double diff)
     mRange.lower *= diff;
     mRange.upper *= diff;
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -9169,8 +9169,8 @@ void QCPAxis::scaleRange(double factor, double center)
     } else
       qDebug() << Q_FUNC_INFO << "Center of scaling operation doesn't lie in same logarithmic sign domain as range:" << center;
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -9214,7 +9214,7 @@ void QCPAxis::rescale(bool onlyVisiblePlottables)
 {
   QCPRange newRange;
   bool haveRange = false;
-  foreach (QCPAbstractPlottable *plottable, plottables())
+  Q_FOREACH (QCPAbstractPlottable *plottable, plottables())
   {
     if (!plottable->realVisibility() && onlyVisiblePlottables)
       continue;
@@ -9394,7 +9394,7 @@ QList<QCPAbstractPlottable*> QCPAxis::plottables() const
   QList<QCPAbstractPlottable*> result;
   if (!mParentPlot) return result;
   
-  foreach (QCPAbstractPlottable *plottable, mParentPlot->mPlottables)
+  Q_FOREACH (QCPAbstractPlottable *plottable, mParentPlot->mPlottables)
   {
     if (plottable->keyAxis() == this || plottable->valueAxis() == this)
       result.append(plottable);
@@ -9412,7 +9412,7 @@ QList<QCPGraph*> QCPAxis::graphs() const
   QList<QCPGraph*> result;
   if (!mParentPlot) return result;
   
-  foreach (QCPGraph *graph, mParentPlot->mGraphs)
+  Q_FOREACH (QCPGraph *graph, mParentPlot->mGraphs)
   {
     if (graph->keyAxis() == this || graph->valueAxis() == this)
       result.append(graph);
@@ -9431,9 +9431,9 @@ QList<QCPAbstractItem*> QCPAxis::items() const
   QList<QCPAbstractItem*> result;
   if (!mParentPlot) return result;
   
-  foreach (QCPAbstractItem *item, mParentPlot->mItems)
+  Q_FOREACH (QCPAbstractItem *item, mParentPlot->mItems)
   {
-    foreach (QCPItemPosition *position, item->positions())
+    Q_FOREACH (QCPItemPosition *position, item->positions())
     {
       if (position->keyAxis() == this || position->valueAxis() == this)
       {
@@ -9971,11 +9971,11 @@ void QCPAxisPainterPrivate::draw(QCPPainter *painter)
     int tickDir = (type == QCPAxis::atBottom || type == QCPAxis::atRight) ? -1 : 1; // direction of ticks ("inward" is right for left axis and left for right axis)
     if (QCPAxis::orientation(type) == Qt::Horizontal)
     {
-      foreach (double tickPos, tickPositions)
+      Q_FOREACH (double tickPos, tickPositions)
         painter->drawLine(QLineF(tickPos+xCor, origin.y()-tickLengthOut*tickDir+yCor, tickPos+xCor, origin.y()+tickLengthIn*tickDir+yCor));
     } else
     {
-      foreach (double tickPos, tickPositions)
+      Q_FOREACH (double tickPos, tickPositions)
         painter->drawLine(QLineF(origin.x()-tickLengthOut*tickDir+xCor, tickPos+yCor, origin.x()+tickLengthIn*tickDir+xCor, tickPos+yCor));
     }
   }
@@ -9988,11 +9988,11 @@ void QCPAxisPainterPrivate::draw(QCPPainter *painter)
     int tickDir = (type == QCPAxis::atBottom || type == QCPAxis::atRight) ? -1 : 1;
     if (QCPAxis::orientation(type) == Qt::Horizontal)
     {
-      foreach (double subTickPos, subTickPositions)
+      Q_FOREACH (double subTickPos, subTickPositions)
         painter->drawLine(QLineF(subTickPos+xCor, origin.y()-subTickLengthOut*tickDir+yCor, subTickPos+xCor, origin.y()+subTickLengthIn*tickDir+yCor));
     } else
     {
-      foreach (double subTickPos, subTickPositions)
+      Q_FOREACH (double subTickPos, subTickPositions)
         painter->drawLine(QLineF(origin.x()-subTickLengthOut*tickDir+xCor, subTickPos+yCor, origin.x()+subTickLengthIn*tickDir+xCor, subTickPos+yCor));
     }
   }
@@ -10141,7 +10141,7 @@ int QCPAxisPainterPrivate::size()
     QSize tickLabelsSize(0, 0);
     if (!tickLabels.isEmpty())
     {
-      foreach (const QString &tickLabel, tickLabels)
+      Q_FOREACH (const QString &tickLabel, tickLabels)
         getMaxTickLabelSize(tickLabelFont, tickLabel, &tickLabelsSize);
       result += QCPAxis::orientation(type) == Qt::Horizontal ? tickLabelsSize.height() : tickLabelsSize.width();
     result += tickLabelPadding;
@@ -11371,11 +11371,11 @@ bool QCPSelectionDecorator::registerWithPlottable(QCPAbstractPlottable *plottabl
 */
 
 /* end of documentation of pure virtual functions */
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCPAbstractPlottable::selectionChanged(bool selected)
   
-  This signal is emitted when the selection state of this plottable has changed, either by user
+  This signal is Q_EMITted when the selection state of this plottable has changed, either by user
   interaction or by a direct call to \ref setSelection. The parameter \a selected indicates whether
   there are any points selected or not.
   
@@ -11384,7 +11384,7 @@ bool QCPSelectionDecorator::registerWithPlottable(QCPAbstractPlottable *plottabl
 
 /*! \fn void QCPAbstractPlottable::selectionChanged(const QCPDataSelection &selection)
   
-  This signal is emitted when the selection state of this plottable has changed, either by user
+  This signal is Q_EMITted when the selection state of this plottable has changed, either by user
   interaction or by a direct call to \ref setSelection. The parameter \a selection holds the
   currently selected data ranges.
   
@@ -11393,12 +11393,12 @@ bool QCPSelectionDecorator::registerWithPlottable(QCPAbstractPlottable *plottabl
 
 /*! \fn void QCPAbstractPlottable::selectableChanged(QCP::SelectionType selectable);
   
-  This signal is emitted when the selectability of this plottable has changed.
+  This signal is Q_EMITted when the selectability of this plottable has changed.
   
   \see setSelectable
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 
 /*!
   Constructs an abstract plottable which uses \a keyAxis as its key axis ("x") and \a valueAxis as
@@ -11546,7 +11546,7 @@ void QCPAbstractPlottable::setValueAxis(QCPAxis *axis)
   QCP::SelectionType set via \ref setSelectable, the resulting selection will be adjusted
   accordingly (see \ref QCPDataSelection::enforceType).
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see setSelectable, selectTest
 */
@@ -11556,8 +11556,8 @@ void QCPAbstractPlottable::setSelection(QCPDataSelection selection)
   if (mSelection != selection)
   {
     mSelection = selection;
-    emit selectionChanged(selected());
-    emit selectionChanged(mSelection);
+    Q_EMIT selectionChanged(selected());
+    Q_EMIT selectionChanged(mSelection);
   }
 }
 
@@ -11603,11 +11603,11 @@ void QCPAbstractPlottable::setSelectable(QCP::SelectionType selectable)
     mSelectable = selectable;
     QCPDataSelection oldSelection = mSelection;
     mSelection.enforceType(mSelectable);
-    emit selectableChanged(mSelectable);
+    Q_EMIT selectableChanged(mSelectable);
     if (mSelection != oldSelection)
     {
-      emit selectionChanged(selected());
-      emit selectionChanged(mSelection);
+      Q_EMIT selectionChanged(selected());
+      Q_EMIT selectionChanged(mSelection);
     }
   }
 }
@@ -12046,12 +12046,12 @@ QCPItemAnchor::QCPItemAnchor(QCustomPlot *parentPlot, QCPAbstractItem *parentIte
 QCPItemAnchor::~QCPItemAnchor()
 {
   // unregister as parent at children:
-  foreach (QCPItemPosition *child, mChildrenX.values())
+  Q_FOREACH (QCPItemPosition *child, mChildrenX.values())
   {
     if (child->parentAnchorX() == this)
       child->setParentAnchorX(nullptr); // this acts back on this anchor and child removes itself from mChildrenX
   }
-  foreach (QCPItemPosition *child, mChildrenY.values())
+  Q_FOREACH (QCPItemPosition *child, mChildrenY.values())
   {
     if (child->parentAnchorY() == this)
       child->setParentAnchorY(nullptr); // this acts back on this anchor and child removes itself from mChildrenY
@@ -12225,12 +12225,12 @@ QCPItemPosition::~QCPItemPosition()
   // unregister as parent at children:
   // Note: this is done in ~QCPItemAnchor again, but it's important QCPItemPosition does it itself, because only then
   //       the setParentAnchor(0) call the correct QCPItemPosition::pixelPosition function instead of QCPItemAnchor::pixelPosition
-  foreach (QCPItemPosition *child, mChildrenX.values())
+  Q_FOREACH (QCPItemPosition *child, mChildrenX.values())
   {
     if (child->parentAnchorX() == this)
       child->setParentAnchorX(nullptr); // this acts back on this anchor and child removes itself from mChildrenX
   }
-  foreach (QCPItemPosition *child, mChildrenY.values())
+  Q_FOREACH (QCPItemPosition *child, mChildrenY.values())
   {
     if (child->parentAnchorY() == this)
       child->setParentAnchorY(nullptr); // this acts back on this anchor and child removes itself from mChildrenY
@@ -12912,14 +12912,14 @@ void QCPItemPosition::setPixelPosition(const QPointF &pixelPosition)
 */
 
 /* end documentation of pure virtual functions */
-/* start documentation of signals */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPAbstractItem::selectionChanged(bool selected)
-  This signal is emitted when the selection state of this item has changed, either by user interaction
+  This signal is Q_EMITted when the selection state of this item has changed, either by user interaction
   or by a direct call to \ref setSelected.
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*!
   Base class constructor which initializes base class members.
@@ -12992,7 +12992,7 @@ void QCPAbstractItem::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    emit selectableChanged(mSelectable);
+    Q_EMIT selectableChanged(mSelectable);
   }
 }
 
@@ -13006,7 +13006,7 @@ void QCPAbstractItem::setSelectable(bool selectable)
   
   This function can change the selection state even when \ref setSelectable was set to false.
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see setSelectable, selectTest
 */
@@ -13015,7 +13015,7 @@ void QCPAbstractItem::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    emit selectionChanged(mSelected);
+    Q_EMIT selectionChanged(mSelected);
   }
 }
 
@@ -13031,7 +13031,7 @@ void QCPAbstractItem::setSelected(bool selected)
 */
 QCPItemPosition *QCPAbstractItem::position(const QString &name) const
 {
-  foreach (QCPItemPosition *position, mPositions)
+  Q_FOREACH (QCPItemPosition *position, mPositions)
   {
     if (position->name() == name)
       return position;
@@ -13052,7 +13052,7 @@ QCPItemPosition *QCPAbstractItem::position(const QString &name) const
 */
 QCPItemAnchor *QCPAbstractItem::anchor(const QString &name) const
 {
-  foreach (QCPItemAnchor *anchor, mAnchors)
+  Q_FOREACH (QCPItemAnchor *anchor, mAnchors)
   {
     if (anchor->name() == name)
       return anchor;
@@ -13071,7 +13071,7 @@ QCPItemAnchor *QCPAbstractItem::anchor(const QString &name) const
 */
 bool QCPAbstractItem::hasAnchor(const QString &name) const
 {
-  foreach (QCPItemAnchor *anchor, mAnchors)
+  Q_FOREACH (QCPItemAnchor *anchor, mAnchors)
   {
     if (anchor->name() == name)
       return true;
@@ -13136,7 +13136,7 @@ double QCPAbstractItem::rectDistance(const QRectF &rect, const QPointF &pos, boo
                                               << QLineF(rect.topLeft(), rect.bottomLeft()) << QLineF(rect.topRight(), rect.bottomRight());
   const QCPVector2D posVec(pos);
   double minDistSqr = (std::numeric_limits<double>::max)();
-  foreach (const QLineF &line, lines)
+  Q_FOREACH (const QLineF &line, lines)
   {
     double distSqr = posVec.distanceSquaredToLine(line.p1(), line.p2());
     if (distSqr < minDistSqr)
@@ -13293,27 +13293,27 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 */
 
 /* end of documentation of inline functions */
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCustomPlot::mouseDoubleClick(QMouseEvent *event)
 
-  This signal is emitted when the QCustomPlot receives a mouse double click event.
+  This signal is Q_EMITted when the QCustomPlot receives a mouse double click event.
 */
 
 /*! \fn void QCustomPlot::mousePress(QMouseEvent *event)
 
-  This signal is emitted when the QCustomPlot receives a mouse press event.
+  This signal is Q_EMITted when the QCustomPlot receives a mouse press event.
   
-  It is emitted before QCustomPlot handles any other mechanism like range dragging. So a slot
+  It is Q_EMITted before QCustomPlot handles any other mechanism like range dragging. So a slot
   connected to this signal can still influence the behaviour e.g. with \ref QCPAxisRect::setRangeDrag or \ref
   QCPAxisRect::setRangeDragAxes.
 */
 
 /*! \fn void QCustomPlot::mouseMove(QMouseEvent *event)
 
-  This signal is emitted when the QCustomPlot receives a mouse move event.
+  This signal is Q_EMITted when the QCustomPlot receives a mouse move event.
   
-  It is emitted before QCustomPlot handles any other mechanism like range dragging. So a slot
+  It is Q_EMITted before QCustomPlot handles any other mechanism like range dragging. So a slot
   connected to this signal can still influence the behaviour e.g. with \ref QCPAxisRect::setRangeDrag or \ref
   QCPAxisRect::setRangeDragAxes.
   
@@ -13325,25 +13325,25 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::mouseRelease(QMouseEvent *event)
 
-  This signal is emitted when the QCustomPlot receives a mouse release event.
+  This signal is Q_EMITted when the QCustomPlot receives a mouse release event.
   
-  It is emitted before QCustomPlot handles any other mechanisms like object selection. So a
+  It is Q_EMITted before QCustomPlot handles any other mechanisms like object selection. So a
   slot connected to this signal can still influence the behaviour e.g. with \ref setInteractions or
   \ref QCPAbstractPlottable::setSelectable.
 */
 
 /*! \fn void QCustomPlot::mouseWheel(QMouseEvent *event)
 
-  This signal is emitted when the QCustomPlot receives a mouse wheel event.
+  This signal is Q_EMITted when the QCustomPlot receives a mouse wheel event.
   
-  It is emitted before QCustomPlot handles any other mechanisms like range zooming. So a slot
+  It is Q_EMITted before QCustomPlot handles any other mechanisms like range zooming. So a slot
   connected to this signal can still influence the behaviour e.g. with \ref QCPAxisRect::setRangeZoom, \ref
   QCPAxisRect::setRangeZoomAxes or \ref QCPAxisRect::setRangeZoomFactor.
 */
 
 /*! \fn void QCustomPlot::plottableClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event)
 
-  This signal is emitted when a plottable is clicked.
+  This signal is Q_EMITted when a plottable is clicked.
 
   \a event is the mouse event that caused the click and \a plottable is the plottable that received
   the click. The parameter \a dataIndex indicates the data point that was closest to the click
@@ -13354,7 +13354,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::plottableDoubleClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event)
 
-  This signal is emitted when a plottable is double clicked.
+  This signal is Q_EMITted when a plottable is double clicked.
 
   \a event is the mouse event that caused the click and \a plottable is the plottable that received
   the click. The parameter \a dataIndex indicates the data point that was closest to the click
@@ -13365,7 +13365,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::itemClick(QCPAbstractItem *item, QMouseEvent *event)
   
-  This signal is emitted when an item is clicked.
+  This signal is Q_EMITted when an item is clicked.
 
   \a event is the mouse event that caused the click and \a item is the item that received the
   click.
@@ -13375,7 +13375,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::itemDoubleClick(QCPAbstractItem *item, QMouseEvent *event)
   
-  This signal is emitted when an item is double clicked.
+  This signal is Q_EMITted when an item is double clicked.
   
   \a event is the mouse event that caused the click and \a item is the item that received the
   click.
@@ -13385,7 +13385,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::axisClick(QCPAxis *axis, QCPAxis::SelectablePart part, QMouseEvent *event)
   
-  This signal is emitted when an axis is clicked.
+  This signal is Q_EMITted when an axis is clicked.
   
   \a event is the mouse event that caused the click, \a axis is the axis that received the click and
   \a part indicates the part of the axis that was clicked.
@@ -13395,7 +13395,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::axisDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part, QMouseEvent *event)
 
-  This signal is emitted when an axis is double clicked.
+  This signal is Q_EMITted when an axis is double clicked.
   
   \a event is the mouse event that caused the click, \a axis is the axis that received the click and
   \a part indicates the part of the axis that was clicked.
@@ -13405,7 +13405,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::legendClick(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event)
 
-  This signal is emitted when a legend (item) is clicked.
+  This signal is Q_EMITted when a legend (item) is clicked.
   
   \a event is the mouse event that caused the click, \a legend is the legend that received the
   click and \a item is the legend item that received the click. If only the legend and no item is
@@ -13417,7 +13417,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::legendDoubleClick(QCPLegend *legend,  QCPAbstractLegendItem *item, QMouseEvent *event)
 
-  This signal is emitted when a legend (item) is double clicked.
+  This signal is Q_EMITted when a legend (item) is double clicked.
   
   \a event is the mouse event that caused the click, \a legend is the legend that received the
   click and \a item is the legend item that received the click. If only the legend and no item is
@@ -13429,14 +13429,14 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::selectionChangedByUser()
   
-  This signal is emitted after the user has changed the selection in the QCustomPlot, e.g. by
-  clicking. It is not emitted when the selection state of an object has changed programmatically by
+  This signal is Q_EMITted after the user has changed the selection in the QCustomPlot, e.g. by
+  clicking. It is not Q_EMITted when the selection state of an object has changed programmatically by
   a direct call to <tt>setSelected()</tt>/<tt>setSelection()</tt> on an object or by calling \ref
   deselectAll.
   
-  In addition to this signal, selectable objects also provide individual signals, for example \ref
-  QCPAxis::selectionChanged or \ref QCPAbstractPlottable::selectionChanged. Note that those signals
-  are emitted even if the selection state is changed programmatically.
+  In addition to this signal, selectable objects also provide individual Q_SIGNALS, for example \ref
+  QCPAxis::selectionChanged or \ref QCPAbstractPlottable::selectionChanged. Note that those Q_SIGNALS
+  are Q_EMITted even if the selection state is changed programmatically.
   
   See the documentation of \ref setInteractions for details about the selection mechanism.
   
@@ -13445,7 +13445,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::beforeReplot()
   
-  This signal is emitted immediately before a replot takes place (caused by a call to the slot \ref
+  This signal is Q_EMITted immediately before a replot takes place (caused by a call to the slot \ref
   replot).
   
   It is safe to mutually connect the replot slot with this signal on two QCustomPlots to make them
@@ -13456,10 +13456,10 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::afterLayout()
 
-  This signal is emitted immediately after the layout step has been completed, which occurs right
+  This signal is Q_EMITted immediately after the layout step has been completed, which occurs right
   before drawing the plot. This is typically during a call to \ref replot, and in such cases this
-  signal is emitted in between the signals \ref beforeReplot and \ref afterReplot. Unlike those
-  signals however, this signal is also emitted during off-screen painting, such as when calling
+  signal is Q_EMITted in between the Q_SIGNALS \ref beforeReplot and \ref afterReplot. Unlike those
+  Q_SIGNALS however, this signal is also Q_EMITted during off-screen painting, such as when calling
   \ref toPixmap or \ref savePdf.
 
   The layout step queries all layouts and layout elements in the plot for their proposed size and
@@ -13477,7 +13477,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
 
 /*! \fn void QCustomPlot::afterReplot()
   
-  This signal is emitted immediately after a replot has taken place (caused by a call to the slot \ref
+  This signal is Q_EMITted immediately after a replot has taken place (caused by a call to the slot \ref
   replot).
   
   It is safe to mutually connect the replot slot with this signal on two QCustomPlots to make them
@@ -13486,7 +13486,7 @@ QCP::Interaction QCPAbstractItem::selectionCategory() const
   \see replot, beforeReplot, afterLayout
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 /* start of documentation of public members */
 
 /*! \var QCPAxis *QCustomPlot::xAxis
@@ -13849,14 +13849,14 @@ void QCustomPlot::setAutoAddPlottableToLegend(bool on)
   need to check their selected state explicitly.
   
   If the selection state has changed by user interaction, the \ref selectionChangedByUser signal is
-  emitted. Each selectable object additionally emits an individual selectionChanged signal whenever
+  Q_EMITted. Each selectable object additionally Q_EMITs an individual selectionChanged signal whenever
   their selection state has changed, i.e. not only by user interaction.
   
   To allow multiple objects to be selected by holding the selection modifier (\ref
   setMultiSelectModifier), set the flag \ref QCP::iMultiSelect.
   
-  \note In addition to the selection mechanism presented here, QCustomPlot always emits
-  corresponding signals, when an object is clicked or double clicked. see \ref plottableClick and
+  \note In addition to the selection mechanism presented here, QCustomPlot always Q_EMITs
+  corresponding Q_SIGNALS, when an object is clicked or double clicked. see \ref plottableClick and
   \ref plottableDoubleClick for example.
   
   \see setInteraction, setSelectionTolerance
@@ -13965,7 +13965,7 @@ void QCustomPlot::setMultiSelectModifier(Qt::KeyboardModifier modifier)
   
   If you wish to provide your user both with axis range dragging and data selection/range zooming,
   use this method to switch between the modes just before the interaction is processed, e.g. in
-  reaction to the \ref mousePress or \ref mouseMove signals. For example you could check whether
+  reaction to the \ref mousePress or \ref mouseMove Q_SIGNALS. For example you could check whether
   the user is holding a certain keyboard modifier, and then decide which \a mode shall be set.
   
   If a selection rect interaction is currently active, and \a mode is set to \ref QCP::srmNone, the
@@ -14138,7 +14138,7 @@ void QCustomPlot::setBufferDevicePixelRatio(double ratio)
   {
 #ifdef QCP_DEVICEPIXELRATIO_SUPPORTED
     mBufferDevicePixelRatio = ratio;
-    foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
+    Q_FOREACH (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
       buffer->setDevicePixelRatio(mBufferDevicePixelRatio);
     // Note: axis label cache has devicePixelRatio as part of cache hash, so no need to manually clear cache here
 #else
@@ -14342,7 +14342,7 @@ int QCustomPlot::plottableCount() const
 QList<QCPAbstractPlottable*> QCustomPlot::selectedPlottables() const
 {
   QList<QCPAbstractPlottable*> result;
-  foreach (QCPAbstractPlottable *plottable, mPlottables)
+  Q_FOREACH (QCPAbstractPlottable *plottable, mPlottables)
   {
     if (plottable->selected())
       result.append(plottable);
@@ -14504,7 +14504,7 @@ int QCustomPlot::graphCount() const
 QList<QCPGraph*> QCustomPlot::selectedGraphs() const
 {
   QList<QCPGraph*> result;
-  foreach (QCPGraph *graph, mGraphs)
+  Q_FOREACH (QCPGraph *graph, mGraphs)
   {
     if (graph->selected())
       result.append(graph);
@@ -14617,7 +14617,7 @@ int QCustomPlot::itemCount() const
 QList<QCPAbstractItem*> QCustomPlot::selectedItems() const
 {
   QList<QCPAbstractItem*> result;
-  foreach (QCPAbstractItem *item, mItems)
+  Q_FOREACH (QCPAbstractItem *item, mItems)
   {
     if (item->selected())
       result.append(item);
@@ -14659,7 +14659,7 @@ bool QCustomPlot::hasItem(QCPAbstractItem *item) const
 */
 QCPLayer *QCustomPlot::layer(const QString &name) const
 {
-  foreach (QCPLayer *layer, mLayers)
+  Q_FOREACH (QCPLayer *layer, mLayers)
   {
     if (layer->name() == name)
       return layer;
@@ -14814,7 +14814,7 @@ bool QCustomPlot::removeLayer(QCPLayer *layer)
   QList<QCPLayerable*> children = layer->children();
   if (isFirstLayer) // prepend in reverse order (such that relative order stays the same)
     std::reverse(children.begin(), children.end());
-  foreach (QCPLayerable *child, children)
+  Q_FOREACH (QCPLayerable *child, children)
     child->moveToLayer(targetLayer, isFirstLayer); // prepend if isFirstLayer, otherwise append
   
   // if removed layer is current layer, change current layer to layer below/above:
@@ -14935,7 +14935,7 @@ QList<QCPAxisRect*> QCustomPlot::axisRects() const
   
   while (!elementStack.isEmpty())
   {
-    foreach (QCPLayoutElement *element, elementStack.pop()->elements(false))
+    Q_FOREACH (QCPLayoutElement *element, elementStack.pop()->elements(false))
     {
       if (element)
       {
@@ -14965,7 +14965,7 @@ QCPLayoutElement *QCustomPlot::layoutElementAt(const QPointF &pos) const
   while (searchSubElements && currentElement)
   {
     searchSubElements = false;
-    foreach (QCPLayoutElement *subElement, currentElement->elements(false))
+    Q_FOREACH (QCPLayoutElement *subElement, currentElement->elements(false))
     {
       if (subElement && subElement->realVisibility() && subElement->selectTest(pos, false) >= 0)
       {
@@ -14996,7 +14996,7 @@ QCPAxisRect *QCustomPlot::axisRectAt(const QPointF &pos) const
   while (searchSubElements && currentElement)
   {
     searchSubElements = false;
-    foreach (QCPLayoutElement *subElement, currentElement->elements(false))
+    Q_FOREACH (QCPLayoutElement *subElement, currentElement->elements(false))
     {
       if (subElement && subElement->realVisibility() && subElement->selectTest(pos, false) >= 0)
       {
@@ -15021,10 +15021,10 @@ QCPAxisRect *QCustomPlot::axisRectAt(const QPointF &pos) const
 QList<QCPAxis*> QCustomPlot::selectedAxes() const
 {
   QList<QCPAxis*> result, allAxes;
-  foreach (QCPAxisRect *rect, axisRects())
+  Q_FOREACH (QCPAxisRect *rect, axisRects())
     allAxes << rect->axes();
   
-  foreach (QCPAxis *axis, allAxes)
+  Q_FOREACH (QCPAxis *axis, allAxes)
   {
     if (axis->selectedParts() != QCPAxis::spNone)
       result.append(axis);
@@ -15050,7 +15050,7 @@ QList<QCPLegend*> QCustomPlot::selectedLegends() const
   
   while (!elementStack.isEmpty())
   {
-    foreach (QCPLayoutElement *subElement, elementStack.pop()->elements(false))
+    Q_FOREACH (QCPLayoutElement *subElement, elementStack.pop()->elements(false))
     {
       if (subElement)
       {
@@ -15070,17 +15070,17 @@ QList<QCPLegend*> QCustomPlot::selectedLegends() const
 /*!
   Deselects all layerables (plottables, items, axes, legends,...) of the QCustomPlot.
   
-  Since calling this function is not a user interaction, this does not emit the \ref
-  selectionChangedByUser signal. The individual selectionChanged signals are emitted though, if the
+  Since calling this function is not a user interaction, this does not Q_EMIT the \ref
+  selectionChangedByUser signal. The individual selectionChanged Q_SIGNALS are Q_EMITted though, if the
   objects were previously selected.
   
   \see setInteractions, selectedPlottables, selectedItems, selectedAxes, selectedLegends
 */
 void QCustomPlot::deselectAll()
 {
-  foreach (QCPLayer *layer, mLayers)
+  Q_FOREACH (QCPLayer *layer, mLayers)
   {
-    foreach (QCPLayerable *layerable, layer->children())
+    Q_FOREACH (QCPLayerable *layerable, layer->children())
       layerable->deselectEvent(nullptr);
   }
 }
@@ -15101,9 +15101,9 @@ void QCustomPlot::deselectAll()
   Under a few circumstances, QCustomPlot causes a replot by itself. Those are resize events of the
   QCustomPlot widget and user interactions (object selection and range dragging/zooming).
 
-  Before the replot happens, the signal \ref beforeReplot is emitted. After the replot, \ref
-  afterReplot is emitted. It is safe to mutually connect the replot slot with any of those two
-  signals on two QCustomPlots to make them replot synchronously, it won't cause an infinite
+  Before the replot happens, the signal \ref beforeReplot is Q_EMITted. After the replot, \ref
+  afterReplot is Q_EMITted. It is safe to mutually connect the replot slot with any of those two
+  Q_SIGNALS on two QCustomPlots to make them replot synchronously, it won't cause an infinite
   recursion.
 
   If a layer is in mode \ref QCPLayer::lmBuffered (\ref QCPLayer::setMode), it is also possible to
@@ -15124,11 +15124,11 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
     return;
   }
   
-  if (mReplotting) // incase signals loop back to replot slot
+  if (mReplotting) // incase Q_SIGNALS loop back to replot slot
     return;
   mReplotting = true;
   mReplotQueued = false;
-  emit beforeReplot();
+  Q_EMIT beforeReplot();
   
 # if QT_VERSION < QT_VERSION_CHECK(4, 8, 0)
   QTime replotTimer;
@@ -15141,9 +15141,9 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
   updateLayout();
   // draw all layered objects (grid, axes, plottables, items, legend,...) into their buffers:
   setupPaintBuffers();
-  foreach (QCPLayer *layer, mLayers)
+  Q_FOREACH (QCPLayer *layer, mLayers)
     layer->drawToPaintBuffer();
-  foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
+  Q_FOREACH (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
     buffer->setInvalidated(false);
   
   if ((refreshPriority == rpRefreshHint && mPlottingHints.testFlag(QCP::phImmediateRefresh)) || refreshPriority==rpImmediateRefresh)
@@ -15161,7 +15161,7 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
   else
     mReplotTimeAverage = mReplotTime; // no previous replots to average with, so initialize with replot time
   
-  emit afterReplot();
+  Q_EMIT afterReplot();
   mReplotting = false;
 }
 
@@ -15187,10 +15187,10 @@ double QCustomPlot::replotTime(bool average) const
 void QCustomPlot::rescaleAxes(bool onlyVisiblePlottables)
 {
   QList<QCPAxis*> allAxes;
-  foreach (QCPAxisRect *rect, axisRects())
+  Q_FOREACH (QCPAxisRect *rect, axisRects())
     allAxes << rect->axes();
   
-  foreach (QCPAxis *axis, allAxes)
+  Q_FOREACH (QCPAxis *axis, allAxes)
     axis->rescale(onlyVisiblePlottables);
 }
 
@@ -15475,7 +15475,7 @@ void QCustomPlot::paintEvent(QPaintEvent *event)
     if (mBackgroundBrush.style() != Qt::NoBrush)
       painter.fillRect(mViewport, mBackgroundBrush);
     drawBackground(&painter);
-    foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
+    Q_FOREACH (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
       buffer->draw(&painter);
   }
 }
@@ -15495,16 +15495,16 @@ void QCustomPlot::resizeEvent(QResizeEvent *event)
 
 /*! \internal
   
- Event handler for when a double click occurs. Emits the \ref mouseDoubleClick signal, then
- determines the layerable under the cursor and forwards the event to it. Finally, emits the
- specialized signals when certain objecs are clicked (e.g. \ref plottableDoubleClick, \ref
+ Event handler for when a double click occurs. Q_EMITs the \ref mouseDoubleClick signal, then
+ determines the layerable under the cursor and forwards the event to it. Finally, Q_EMITs the
+ specialized Q_SIGNALS when certain objecs are clicked (e.g. \ref plottableDoubleClick, \ref
  axisDoubleClick, etc.).
  
  \see mousePressEvent, mouseReleaseEvent
 */
 void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
 {
-  emit mouseDoubleClick(event);
+  Q_EMIT mouseDoubleClick(event);
   mMouseHasMoved = false;
   mMousePressPos = event->pos();
   
@@ -15523,7 +15523,7 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
     }
   }
   
-  // emit specialized object double click signals:
+  // Q_EMIT specialized object double click Q_SIGNALS:
   if (!candidates.isEmpty())
   {
     if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(candidates.first()))
@@ -15531,15 +15531,15 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
       int dataIndex = 0;
       if (!details.first().value<QCPDataSelection>().isEmpty())
         dataIndex = details.first().value<QCPDataSelection>().dataRange().begin();
-      emit plottableDoubleClick(ap, dataIndex, event);
+      Q_EMIT plottableDoubleClick(ap, dataIndex, event);
     } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(candidates.first()))
-      emit axisDoubleClick(ax, details.first().value<QCPAxis::SelectablePart>(), event);
+      Q_EMIT axisDoubleClick(ax, details.first().value<QCPAxis::SelectablePart>(), event);
     else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(candidates.first()))
-      emit itemDoubleClick(ai, event);
+      Q_EMIT itemDoubleClick(ai, event);
     else if (QCPLegend *lg = qobject_cast<QCPLegend*>(candidates.first()))
-      emit legendDoubleClick(lg, nullptr, event);
+      Q_EMIT legendDoubleClick(lg, nullptr, event);
     else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(candidates.first()))
-      emit legendDoubleClick(li->parentLegend(), li, event);
+      Q_EMIT legendDoubleClick(li->parentLegend(), li, event);
   }
   
   event->accept(); // in case QCPLayerable reimplementation manipulates event accepted state. In QWidget event system, QCustomPlot wants to accept the event.
@@ -15547,7 +15547,7 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
 
 /*! \internal
   
-  Event handler for when a mouse button is pressed. Emits the mousePress signal.
+  Event handler for when a mouse button is pressed. Q_EMITs the mousePress signal.
 
   If the current \ref setSelectionRectMode is not \ref QCP::srmNone, passes the event to the
   selection rect. Otherwise determines the layerable under the cursor and forwards the event to it.
@@ -15556,7 +15556,7 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
 */
 void QCustomPlot::mousePressEvent(QMouseEvent *event)
 {
-  emit mousePress(event);
+  Q_EMIT mousePress(event);
   // save some state to tell in releaseEvent whether it was a click:
   mMouseHasMoved = false;
   mMousePressPos = event->pos();
@@ -15572,7 +15572,7 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
     QList<QCPLayerable*> candidates = layerableListAt(mMousePressPos, false, &details);
     if (!candidates.isEmpty())
     {
-      mMouseSignalLayerable = candidates.first(); // candidate for signal emission is always topmost hit layerable (signal emitted in release event)
+      mMouseSignalLayerable = candidates.first(); // candidate for signal emission is always topmost hit layerable (signal Q_EMITted in release event)
       mMouseSignalLayerableDetails = details.first();
     }
     // forward event to topmost candidate which accepts the event:
@@ -15594,7 +15594,7 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
 
 /*! \internal
   
-  Event handler for when the cursor is moved. Emits the \ref mouseMove signal.
+  Event handler for when the cursor is moved. Q_EMITs the \ref mouseMove signal.
 
   If the selection rect (\ref setSelectionRect) is currently active, the event is forwarded to it
   in order to update the rect geometry.
@@ -15606,7 +15606,7 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
 */
 void QCustomPlot::mouseMoveEvent(QMouseEvent *event)
 {
-  emit mouseMove(event);
+  Q_EMIT mouseMove(event);
   
   if (!mMouseHasMoved && (mMousePressPos-event->pos()).manhattanLength() > 3)
     mMouseHasMoved = true; // moved too far from mouse press position, don't handle as click on mouse release
@@ -15621,12 +15621,12 @@ void QCustomPlot::mouseMoveEvent(QMouseEvent *event)
 
 /*! \internal
 
-  Event handler for when a mouse button is released. Emits the \ref mouseRelease signal.
+  Event handler for when a mouse button is released. Q_EMITs the \ref mouseRelease signal.
 
   If the mouse was moved less than a certain threshold in any direction since the \ref
   mousePressEvent, it is considered a click which causes the selection mechanism (if activated via
   \ref setInteractions) to possibly change selection states accordingly. Further, specialized mouse
-  click signals are emitted (e.g. \ref plottableClick, \ref axisClick, etc.)
+  click Q_SIGNALS are Q_EMITted (e.g. \ref plottableClick, \ref axisClick, etc.)
 
   If a layerable is the mouse capturer (a \ref mousePressEvent happened on top of the layerable
   before), the \ref mouseReleaseEvent is forwarded to that element.
@@ -15635,7 +15635,7 @@ void QCustomPlot::mouseMoveEvent(QMouseEvent *event)
 */
 void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
 {
-  emit mouseRelease(event);
+  Q_EMIT mouseRelease(event);
   
   if (!mMouseHasMoved) // mouse hasn't moved (much) between press and release, so handle as click
   {
@@ -15644,21 +15644,21 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
       processPointSelection(event);
     
-    // emit specialized click signals of QCustomPlot instance:
+    // Q_EMIT specialized click Q_SIGNALS of QCustomPlot instance:
     if (QCPAbstractPlottable *ap = qobject_cast<QCPAbstractPlottable*>(mMouseSignalLayerable))
     {
       int dataIndex = 0;
       if (!mMouseSignalLayerableDetails.value<QCPDataSelection>().isEmpty())
         dataIndex = mMouseSignalLayerableDetails.value<QCPDataSelection>().dataRange().begin();
-      emit plottableClick(ap, dataIndex, event);
+      Q_EMIT plottableClick(ap, dataIndex, event);
     } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseSignalLayerable))
-      emit axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
+      Q_EMIT axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
     else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseSignalLayerable))
-      emit itemClick(ai, event);
+      Q_EMIT itemClick(ai, event);
     else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseSignalLayerable))
-      emit legendClick(lg, nullptr, event);
+      Q_EMIT legendClick(lg, nullptr, event);
     else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseSignalLayerable))
-      emit legendClick(li->parentLegend(), li, event);
+      Q_EMIT legendClick(li->parentLegend(), li, event);
     mMouseSignalLayerable = nullptr;
   }
   
@@ -15684,12 +15684,12 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
 
 /*! \internal
 
-  Event handler for mouse wheel events. First, the \ref mouseWheel signal is emitted. Then
+  Event handler for mouse wheel events. First, the \ref mouseWheel signal is Q_EMITted. Then
   determines the affected layerable and forwards the event to it.
 */
 void QCustomPlot::wheelEvent(QWheelEvent *event)
 {
-  emit mouseWheel(event);
+  Q_EMIT mouseWheel(event);
   
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
   const QPointF pos = event->pos();
@@ -15698,7 +15698,7 @@ void QCustomPlot::wheelEvent(QWheelEvent *event)
 #endif
   
   // forward event to layerable under cursor:
-  foreach (QCPLayerable *candidate, layerableListAt(pos, false))
+  Q_FOREACH (QCPLayerable *candidate, layerableListAt(pos, false))
   {
     event->accept(); // default impl of QCPLayerable's mouse events ignore the event, in that case propagate to next candidate in list
     candidate->wheelEvent(event);
@@ -15726,11 +15726,11 @@ void QCustomPlot::draw(QCPPainter *painter)
   drawBackground(painter);
 
   // draw all layered objects (grid, axes, plottables, items, legend,...):
-  foreach (QCPLayer *layer, mLayers)
+  Q_FOREACH (QCPLayer *layer, mLayers)
     layer->draw(painter);
   
   /* Debug code to draw all layout element rects
-  foreach (QCPLayoutElement *el, findChildren<QCPLayoutElement*>())
+  Q_FOREACH (QCPLayoutElement *el, findChildren<QCPLayoutElement*>())
   {
     painter->setBrush(Qt::NoBrush);
     painter->setPen(QPen(QColor(0, 0, 0, 100), 0, Qt::DashLine));
@@ -15756,7 +15756,7 @@ void QCustomPlot::updateLayout()
   mPlotLayout->update(QCPLayoutElement::upMargins);
   mPlotLayout->update(QCPLayoutElement::upLayout);
 
-  emit afterLayout();
+  Q_EMIT afterLayout();
 }
 
 /*! \internal
@@ -15847,7 +15847,7 @@ void QCustomPlot::setupPaintBuffers()
   while (mPaintBuffers.size()-1 > bufferIndex)
     mPaintBuffers.removeLast();
   // resize buffers to viewport size and clear contents:
-  foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
+  Q_FOREACH (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
   {
     buffer->setSize(viewport().size()); // won't do anything if already correct size
     buffer->clear(Qt::transparent);
@@ -15892,7 +15892,7 @@ QCPAbstractPaintBuffer *QCustomPlot::createPaintBuffer()
 */
 bool QCustomPlot::hasInvalidatedPaintBuffers()
 {
-  foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
+  Q_FOREACH (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
   {
     if (buffer->invalidated())
       return true;
@@ -16041,7 +16041,7 @@ void QCustomPlot::processRectSelection(QRect rect, QMouseEvent *event)
     if (QCPAxisRect *affectedAxisRect = axisRectAt(rectF.topLeft()))
     {
       // determine plottables that were hit by the rect and thus are candidates for selection:
-      foreach (QCPAbstractPlottable *plottable, affectedAxisRect->plottables())
+      Q_FOREACH (QCPAbstractPlottable *plottable, affectedAxisRect->plottables())
       {
         if (QCPPlottableInterface1D *plottableInterface = plottable->interface1D())
         {
@@ -16066,10 +16066,10 @@ void QCustomPlot::processRectSelection(QRect rect, QMouseEvent *event)
       // deselect all other layerables if not additive selection:
       if (!additive)
       {
-        // emit deselection except to those plottables who will be selected afterwards:
-        foreach (QCPLayer *layer, mLayers)
+        // Q_EMIT deselection except to those plottables who will be selected afterwards:
+        Q_FOREACH (QCPLayer *layer, mLayers)
         {
-          foreach (QCPLayerable *layerable, layer->children())
+          Q_FOREACH (QCPLayerable *layerable, layer->children())
           {
             if ((potentialSelections.isEmpty() || potentialSelections.constBegin()->first != layerable) && mInteractions.testFlag(layerable->selectionCategory()))
             {
@@ -16081,7 +16081,7 @@ void QCustomPlot::processRectSelection(QRect rect, QMouseEvent *event)
         }
       }
       
-      // go through selections in reverse (largest selection first) and emit select events:
+      // go through selections in reverse (largest selection first) and Q_EMIT select events:
       SelectionCandidates::const_iterator it = potentialSelections.constEnd();
       while (it != potentialSelections.constBegin())
       {
@@ -16098,7 +16098,7 @@ void QCustomPlot::processRectSelection(QRect rect, QMouseEvent *event)
   
   if (selectionStateChanged)
   {
-    emit selectionChangedByUser();
+    Q_EMIT selectionChangedByUser();
     replot(rpQueuedReplot);
   } else if (mSelectionRect)
     mSelectionRect->layer()->replot();
@@ -16153,9 +16153,9 @@ void QCustomPlot::processPointSelection(QMouseEvent *event)
   // deselect all other layerables if not additive selection:
   if (!additive)
   {
-    foreach (QCPLayer *layer, mLayers)
+    Q_FOREACH (QCPLayer *layer, mLayers)
     {
-      foreach (QCPLayerable *layerable, layer->children())
+      Q_FOREACH (QCPLayerable *layerable, layer->children())
       {
         if (layerable != clickedLayerable && mInteractions.testFlag(layerable->selectionCategory()))
         {
@@ -16175,7 +16175,7 @@ void QCustomPlot::processPointSelection(QMouseEvent *event)
   }
   if (selectionStateChanged)
   {
-    emit selectionChangedByUser();
+    Q_EMIT selectionChangedByUser();
     replot(rpQueuedReplot);
   }
 }
@@ -17293,7 +17293,7 @@ void QCPSelectionDecoratorBracket::drawDecoration(QCPPainter *painter, QCPDataSe
   
   if (QCPPlottableInterface1D *interface1d = mPlottable->interface1D())
   {
-    foreach (const QCPDataRange &dataRange, selection.dataRanges())
+    Q_FOREACH (const QCPDataRange &dataRange, selection.dataRanges())
     {
       // determine position and (if tangent mode is enabled) angle of brackets:
       int openBracketDir = (mPlottable->keyAxis() && !mPlottable->keyAxis()->rangeReversed()) ? 1 : -1;
@@ -17582,7 +17582,7 @@ QCPAxisRect::~QCPAxisRect()
   delete mInsetLayout;
   mInsetLayout = nullptr;
   
-  foreach (QCPAxis *axis, axes())
+  Q_FOREACH (QCPAxis *axis, axes())
     removeAxis(axis);
 }
 
@@ -17793,7 +17793,7 @@ void QCPAxisRect::zoom(const QRectF &pixelRect)
 */
 void QCPAxisRect::zoom(const QRectF &pixelRect, const QList<QCPAxis*> &affectedAxes)
 {
-  foreach (QCPAxis *axis, affectedAxes)
+  Q_FOREACH (QCPAxis *axis, affectedAxes)
   {
     if (!axis)
     {
@@ -17825,7 +17825,7 @@ void QCPAxisRect::zoom(const QRectF &pixelRect, const QList<QCPAxis*> &affectedA
 
   Tick label visibility (\ref QCPAxis::setTickLabels) of the right and top axes are set to false.
 
-  If \a connectRanges is true, the \ref QCPAxis::rangeChanged "rangeChanged" signals of the bottom
+  If \a connectRanges is true, the \ref QCPAxis::rangeChanged "rangeChanged" Q_SIGNALS of the bottom
   and left axes are connected to the \ref QCPAxis::setRange slots of the top and right axes.
 */
 void QCPAxisRect::setupFullAxesBox(bool connectRanges)
@@ -17895,7 +17895,7 @@ QList<QCPAbstractPlottable*> QCPAxisRect::plottables() const
 {
   // Note: don't append all QCPAxis::plottables() into a list, because we might get duplicate entries
   QList<QCPAbstractPlottable*> result;
-  foreach (QCPAbstractPlottable *plottable, mParentPlot->mPlottables)
+  Q_FOREACH (QCPAbstractPlottable *plottable, mParentPlot->mPlottables)
   {
     if (plottable->keyAxis()->axisRect() == this || plottable->valueAxis()->axisRect() == this)
       result.append(plottable);
@@ -17915,7 +17915,7 @@ QList<QCPGraph*> QCPAxisRect::graphs() const
 {
   // Note: don't append all QCPAxis::graphs() into a list, because we might get duplicate entries
   QList<QCPGraph*> result;
-  foreach (QCPGraph *graph, mParentPlot->mGraphs)
+  Q_FOREACH (QCPGraph *graph, mParentPlot->mGraphs)
   {
     if (graph->keyAxis()->axisRect() == this || graph->valueAxis()->axisRect() == this)
       result.append(graph);
@@ -17938,14 +17938,14 @@ QList<QCPAbstractItem *> QCPAxisRect::items() const
   // Note: don't just append all QCPAxis::items() into a list, because we might get duplicate entries
   //       and miss those items that have this axis rect as clipAxisRect.
   QList<QCPAbstractItem*> result;
-  foreach (QCPAbstractItem *item, mParentPlot->mItems)
+  Q_FOREACH (QCPAbstractItem *item, mParentPlot->mItems)
   {
     if (item->clipAxisRect() == this)
     {
       result.append(item);
       continue;
     }
-    foreach (QCPItemPosition *position, item->positions())
+    Q_FOREACH (QCPItemPosition *position, item->positions())
     {
       if (position->axisRect() == this ||
           position->keyAxis()->axisRect() == this ||
@@ -17977,7 +17977,7 @@ void QCPAxisRect::update(UpdatePhase phase)
   {
     case upPreparation:
     {
-      foreach (QCPAxis *axis, axes())
+      Q_FOREACH (QCPAxis *axis, axes())
         axis->setupTickVectors();
       break;
     }
@@ -18135,14 +18135,14 @@ QList<QCPAxis*> QCPAxisRect::rangeDragAxes(Qt::Orientation orientation)
   QList<QCPAxis*> result;
   if (orientation == Qt::Horizontal)
   {
-    foreach (QPointer<QCPAxis> axis, mRangeDragHorzAxis)
+    Q_FOREACH (QPointer<QCPAxis> axis, mRangeDragHorzAxis)
     {
       if (!axis.isNull())
         result.append(axis.data());
     }
   } else
   {
-    foreach (QPointer<QCPAxis> axis, mRangeDragVertAxis)
+    Q_FOREACH (QPointer<QCPAxis> axis, mRangeDragVertAxis)
     {
       if (!axis.isNull())
         result.append(axis.data());
@@ -18161,14 +18161,14 @@ QList<QCPAxis*> QCPAxisRect::rangeZoomAxes(Qt::Orientation orientation)
   QList<QCPAxis*> result;
   if (orientation == Qt::Horizontal)
   {
-    foreach (QPointer<QCPAxis> axis, mRangeZoomHorzAxis)
+    Q_FOREACH (QPointer<QCPAxis> axis, mRangeZoomHorzAxis)
     {
       if (!axis.isNull())
         result.append(axis.data());
     }
   } else
   {
-    foreach (QPointer<QCPAxis> axis, mRangeZoomVertAxis)
+    Q_FOREACH (QPointer<QCPAxis> axis, mRangeZoomVertAxis)
     {
       if (!axis.isNull())
         result.append(axis.data());
@@ -18261,7 +18261,7 @@ void QCPAxisRect::setRangeDragAxes(QCPAxis *horizontal, QCPAxis *vertical)
 void QCPAxisRect::setRangeDragAxes(QList<QCPAxis*> axes)
 {
   QList<QCPAxis*> horz, vert;
-  foreach (QCPAxis *ax, axes)
+  Q_FOREACH (QCPAxis *ax, axes)
   {
     if (ax->orientation() == Qt::Horizontal)
       horz.append(ax);
@@ -18280,7 +18280,7 @@ void QCPAxisRect::setRangeDragAxes(QList<QCPAxis*> axes)
 void QCPAxisRect::setRangeDragAxes(QList<QCPAxis*> horizontal, QList<QCPAxis*> vertical)
 {
   mRangeDragHorzAxis.clear();
-  foreach (QCPAxis *ax, horizontal)
+  Q_FOREACH (QCPAxis *ax, horizontal)
   {
     QPointer<QCPAxis> axPointer(ax);
     if (!axPointer.isNull())
@@ -18289,7 +18289,7 @@ void QCPAxisRect::setRangeDragAxes(QList<QCPAxis*> horizontal, QList<QCPAxis*> v
       qDebug() << Q_FUNC_INFO << "invalid axis passed in horizontal list:" << reinterpret_cast<quintptr>(ax);
   }
   mRangeDragVertAxis.clear();
-  foreach (QCPAxis *ax, vertical)
+  Q_FOREACH (QCPAxis *ax, vertical)
   {
     QPointer<QCPAxis> axPointer(ax);
     if (!axPointer.isNull())
@@ -18333,7 +18333,7 @@ void QCPAxisRect::setRangeZoomAxes(QCPAxis *horizontal, QCPAxis *vertical)
 void QCPAxisRect::setRangeZoomAxes(QList<QCPAxis*> axes)
 {
   QList<QCPAxis*> horz, vert;
-  foreach (QCPAxis *ax, axes)
+  Q_FOREACH (QCPAxis *ax, axes)
   {
     if (ax->orientation() == Qt::Horizontal)
       horz.append(ax);
@@ -18352,7 +18352,7 @@ void QCPAxisRect::setRangeZoomAxes(QList<QCPAxis*> axes)
 void QCPAxisRect::setRangeZoomAxes(QList<QCPAxis*> horizontal, QList<QCPAxis*> vertical)
 {
   mRangeZoomHorzAxis.clear();
-  foreach (QCPAxis *ax, horizontal)
+  Q_FOREACH (QCPAxis *ax, horizontal)
   {
     QPointer<QCPAxis> axPointer(ax);
     if (!axPointer.isNull())
@@ -18361,7 +18361,7 @@ void QCPAxisRect::setRangeZoomAxes(QList<QCPAxis*> horizontal, QList<QCPAxis*> v
       qDebug() << Q_FUNC_INFO << "invalid axis passed in horizontal list:" << reinterpret_cast<quintptr>(ax);
   }
   mRangeZoomVertAxis.clear();
-  foreach (QCPAxis *ax, vertical)
+  Q_FOREACH (QCPAxis *ax, vertical)
   {
     QPointer<QCPAxis> axPointer(ax);
     if (!axPointer.isNull())
@@ -18537,10 +18537,10 @@ void QCPAxisRect::mousePressEvent(QMouseEvent *event, const QVariant &details)
     if (mParentPlot->interactions().testFlag(QCP::iRangeDrag))
     {
       mDragStartHorzRange.clear();
-      foreach (QPointer<QCPAxis> axis, mRangeDragHorzAxis)
+      Q_FOREACH (QPointer<QCPAxis> axis, mRangeDragHorzAxis)
         mDragStartHorzRange.append(axis.isNull() ? QCPRange() : axis->range());
       mDragStartVertRange.clear();
-      foreach (QPointer<QCPAxis> axis, mRangeDragVertAxis)
+      Q_FOREACH (QPointer<QCPAxis> axis, mRangeDragVertAxis)
         mDragStartVertRange.append(axis.isNull() ? QCPRange() : axis->range());
     }
   }
@@ -18663,7 +18663,7 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
       if (mRangeZoom.testFlag(Qt::Horizontal))
       {
         factor = qPow(mRangeZoomFactorHorz, wheelSteps);
-        foreach (QPointer<QCPAxis> axis, mRangeZoomHorzAxis)
+        Q_FOREACH (QPointer<QCPAxis> axis, mRangeZoomHorzAxis)
         {
           if (!axis.isNull())
             axis->scaleRange(factor, axis->pixelToCoord(pos.x()));
@@ -18672,7 +18672,7 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
       if (mRangeZoom.testFlag(Qt::Vertical))
       {
         factor = qPow(mRangeZoomFactorVert, wheelSteps);
-        foreach (QPointer<QCPAxis> axis, mRangeZoomVertAxis)
+        Q_FOREACH (QPointer<QCPAxis> axis, mRangeZoomVertAxis)
         {
           if (!axis.isNull())
             axis->scaleRange(factor, axis->pixelToCoord(pos.y()));
@@ -18716,15 +18716,15 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
   </table>
 */
 
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCPAbstractLegendItem::selectionChanged(bool selected)
   
-  This signal is emitted when the selection state of this legend item has changed, either by user
+  This signal is Q_EMITted when the selection state of this legend item has changed, either by user
   interaction or by a direct call to \ref setSelected.
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 
 /*!
   Constructs a QCPAbstractLegendItem and associates it with the QCPLegend \a parent. This does not
@@ -18796,7 +18796,7 @@ void QCPAbstractLegendItem::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    emit selectableChanged(mSelectable);
+    Q_EMIT selectableChanged(mSelectable);
   }
 }
 
@@ -18813,7 +18813,7 @@ void QCPAbstractLegendItem::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    emit selectionChanged(mSelected);
+    Q_EMIT selectionChanged(mSelected);
   }
 }
 
@@ -19034,16 +19034,16 @@ QSize QCPPlottableLegendItem::minimumOuterSizeHint() const
   interface.
 */
 
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCPLegend::selectionChanged(QCPLegend::SelectableParts selection);
 
-  This signal is emitted when the selection state of this legend has changed.
+  This signal is Q_EMITted when the selection state of this legend has changed.
   
   \see setSelectedParts, setSelectableParts
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 
 /*!
   Constructs a new QCPLegend instance with default values.
@@ -19211,7 +19211,7 @@ void QCPLegend::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    emit selectableChanged(mSelectableParts);
+    Q_EMIT selectableChanged(mSelectableParts);
   }
 }
 
@@ -19227,7 +19227,7 @@ void QCPLegend::setSelectableParts(const SelectableParts &selectable)
   This function can change the selection state of a part even when \ref setSelectableParts was set to a
   value that actually excludes the part.
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   Note that it doesn't make sense to set the selected state \ref spItems here when it wasn't set
   before, because there's no way to specify which exact items to newly select. Do this by calling
@@ -19257,7 +19257,7 @@ void QCPLegend::setSelectedParts(const SelectableParts &selected)
       }
     }
     mSelectedParts = newSelected;
-    emit selectionChanged(mSelectedParts);
+    Q_EMIT selectionChanged(mSelectedParts);
   }
 }
 
@@ -19626,11 +19626,11 @@ void QCPLegend::parentPlotInitialized(QCustomPlot *parentPlot)
   \snippet documentation/doc-code-snippets/mainwindow.cpp qcptextelement-creation
 */
 
-/* start documentation of signals */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPTextElement::selectionChanged(bool selected)
   
-  This signal is emitted when the selection state has changed to \a selected, either by user
+  This signal is Q_EMITted when the selection state has changed to \a selected, either by user
   interaction or by a direct call to \ref setSelected.
   
   \see setSelected, setSelectable
@@ -19638,19 +19638,19 @@ void QCPLegend::parentPlotInitialized(QCustomPlot *parentPlot)
 
 /*! \fn void QCPTextElement::clicked(QMouseEvent *event)
 
-  This signal is emitted when the text element is clicked.
+  This signal is Q_EMITted when the text element is clicked.
 
   \see doubleClicked, selectTest
 */
 
 /*! \fn void QCPTextElement::doubleClicked(QMouseEvent *event)
 
-  This signal is emitted when the text element is double clicked.
+  This signal is Q_EMITted when the text element is double clicked.
 
   \see clicked, selectTest
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*! \overload
   
@@ -19856,13 +19856,13 @@ void QCPTextElement::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    emit selectableChanged(mSelectable);
+    Q_EMIT selectableChanged(mSelectable);
   }
 }
 
 /*!
   Sets the selection state of this text element to \a selected. If the selection has changed, \ref
-  selectionChanged is emitted.
+  selectionChanged is Q_EMITted.
   
   Note that this function can change the selection state independently of the current \ref
   setSelectable state.
@@ -19872,7 +19872,7 @@ void QCPTextElement::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    emit selectionChanged(mSelected);
+    Q_EMIT selectionChanged(mSelected);
   }
 }
 
@@ -19959,7 +19959,7 @@ double QCPTextElement::selectTest(const QPointF &pos, bool onlySelectable, QVari
 }
 
 /*!
-  Accepts the mouse event in order to emit the according click signal in the \ref
+  Accepts the mouse event in order to Q_EMIT the according click signal in the \ref
   mouseReleaseEvent.
 
   \seebaseclassmethod
@@ -19971,7 +19971,7 @@ void QCPTextElement::mousePressEvent(QMouseEvent *event, const QVariant &details
 }
 
 /*!
-  Emits the \ref clicked signal if the cursor hasn't moved by more than a few pixels since the \ref
+  Q_EMITs the \ref clicked signal if the cursor hasn't moved by more than a few pixels since the \ref
   mousePressEvent.
 
   \seebaseclassmethod
@@ -19979,18 +19979,18 @@ void QCPTextElement::mousePressEvent(QMouseEvent *event, const QVariant &details
 void QCPTextElement::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
 {
   if ((QPointF(event->pos())-startPos).manhattanLength() <= 3)
-    emit clicked(event);
+    Q_EMIT clicked(event);
 }
 
 /*!
-  Emits the \ref doubleClicked signal.
+  Q_EMITs the \ref doubleClicked signal.
 
   \seebaseclassmethod
 */
 void QCPTextElement::mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details)
 {
   Q_UNUSED(details)
-  emit doubleClicked(event);
+  Q_EMIT doubleClicked(event);
 }
 
 /*! \internal
@@ -20076,31 +20076,31 @@ QColor QCPTextElement::mainTextColor() const
   will change, too, to either the left, right, bottom or top axis, depending on which type was set.
 */
 
-/* end documentation of signals */
-/* start documentation of signals */
+/* end documentation of Q_SIGNALS */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPColorScale::dataRangeChanged(const QCPRange &newRange);
   
-  This signal is emitted when the data range changes.
+  This signal is Q_EMITted when the data range changes.
   
   \see setDataRange
 */
 
 /*! \fn void QCPColorScale::dataScaleTypeChanged(QCPAxis::ScaleType scaleType);
   
-  This signal is emitted when the data scale type changes.
+  This signal is Q_EMITted when the data scale type changes.
   
   \see setDataScaleType
 */
 
 /*! \fn void QCPColorScale::gradientChanged(const QCPColorGradient &newGradient);
   
-  This signal is emitted when the gradient changes.
+  This signal is Q_EMITted when the gradient changes.
   
   \see setGradient
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*!
   Constructs a new QCPColorScale.
@@ -20195,7 +20195,7 @@ void QCPColorScale::setType(QCPAxis::AxisType type)
       disconnect(mColorAxis.data(), SIGNAL(scaleTypeChanged(QCPAxis::ScaleType)), this, SLOT(setDataScaleType(QCPAxis::ScaleType)));
     }
     const QList<QCPAxis::AxisType> allAxisTypes = QList<QCPAxis::AxisType>() << QCPAxis::atLeft << QCPAxis::atRight << QCPAxis::atBottom << QCPAxis::atTop;
-    foreach (QCPAxis::AxisType atype, allAxisTypes)
+    Q_FOREACH (QCPAxis::AxisType atype, allAxisTypes)
     {
       mAxisRect.data()->axis(atype)->setTicks(atype == mType);
       mAxisRect.data()->axis(atype)->setTickLabels(atype== mType);
@@ -20205,7 +20205,7 @@ void QCPColorScale::setType(QCPAxis::AxisType type)
     // transfer settings to new axis:
     if (doTransfer)
     {
-      mColorAxis.data()->setRange(rangeTransfer); // range transfer necessary if axis changes from vertical to horizontal or vice versa (axes with same orientation are synchronized via signals)
+      mColorAxis.data()->setRange(rangeTransfer); // range transfer necessary if axis changes from vertical to horizontal or vice versa (axes with same orientation are synchronized via Q_SIGNALS)
       mColorAxis.data()->setLabel(labelTransfer);
       mColorAxis.data()->setTicker(tickerTransfer);
     }
@@ -20231,7 +20231,7 @@ void QCPColorScale::setDataRange(const QCPRange &dataRange)
     mDataRange = dataRange;
     if (mColorAxis)
       mColorAxis.data()->setRange(mDataRange);
-    emit dataRangeChanged(mDataRange);
+    Q_EMIT dataRangeChanged(mDataRange);
   }
 }
 
@@ -20263,7 +20263,7 @@ void QCPColorScale::setDataScaleType(QCPAxis::ScaleType scaleType)
       mColorAxis.data()->setScaleType(mDataScaleType);
     if (mDataScaleType == QCPAxis::stLogarithmic)
       setDataRange(mDataRange.sanitizedForLogScale());
-    emit dataScaleTypeChanged(mDataScaleType);
+    Q_EMIT dataScaleTypeChanged(mDataScaleType);
   }
 }
 
@@ -20281,7 +20281,7 @@ void QCPColorScale::setGradient(const QCPColorGradient &gradient)
     mGradient = gradient;
     if (mAxisRect)
       mAxisRect.data()->mGradientImageInvalidated = true;
-    emit gradientChanged(mGradient);
+    Q_EMIT gradientChanged(mGradient);
   }
 }
 
@@ -20392,7 +20392,7 @@ void QCPColorScale::rescaleDataRange(bool onlyVisibleMaps)
   QCP::SignDomain sign = QCP::sdBoth;
   if (mDataScaleType == QCPAxis::stLogarithmic)
     sign = (mDataRange.upper < 0 ? QCP::sdNegative : QCP::sdPositive);
-  foreach (QCPColorMap *map, maps)
+  Q_FOREACH (QCPColorMap *map, maps)
   {
     if (!map->realVisibility() && onlyVisibleMaps)
       continue;
@@ -20555,7 +20555,7 @@ QCPColorScaleAxisRectPrivate::QCPColorScaleAxisRectPrivate(QCPColorScale *parent
   setParentLayerable(parentColorScale);
   setMinimumMargins(QMargins(0, 0, 0, 0));
   const QList<QCPAxis::AxisType> allAxisTypes = QList<QCPAxis::AxisType>() << QCPAxis::atBottom << QCPAxis::atTop << QCPAxis::atLeft << QCPAxis::atRight;
-  foreach (QCPAxis::AxisType type, allAxisTypes)
+  Q_FOREACH (QCPAxis::AxisType type, allAxisTypes)
   {
     axis(type)->setVisible(true);
     axis(type)->grid()->setVisible(false);
@@ -20576,7 +20576,7 @@ QCPColorScaleAxisRectPrivate::QCPColorScaleAxisRectPrivate(QCPColorScale *parent
   // make layer transfers of color scale transfer to axis rect and axes
   // the axes must be set after axis rect, such that they appear above color gradient drawn by axis rect:
   connect(parentColorScale, SIGNAL(layerChanged(QCPLayer*)), this, SLOT(setLayer(QCPLayer*)));
-  foreach (QCPAxis::AxisType type, allAxisTypes)
+  Q_FOREACH (QCPAxis::AxisType type, allAxisTypes)
     connect(parentColorScale, SIGNAL(layerChanged(QCPLayer*)), axis(type), SLOT(setLayer(QCPLayer*)));
 }
 
@@ -20649,14 +20649,14 @@ void QCPColorScaleAxisRectPrivate::updateGradientImage()
 
 /*! \internal
 
-  This slot is connected to the selectionChanged signals of the four axes in the constructor. It
+  This slot is connected to the selectionChanged Q_SIGNALS of the four axes in the constructor. It
   synchronizes the selection state of the axes.
 */
 void QCPColorScaleAxisRectPrivate::axisSelectionChanged(QCPAxis::SelectableParts selectedParts)
 {
   // axis bases of four axes shall always (de-)selected synchronously:
   const QList<QCPAxis::AxisType> allAxisTypes = QList<QCPAxis::AxisType>() << QCPAxis::atBottom << QCPAxis::atTop << QCPAxis::atLeft << QCPAxis::atRight;
-  foreach (QCPAxis::AxisType type, allAxisTypes)
+  Q_FOREACH (QCPAxis::AxisType type, allAxisTypes)
   {
     if (QCPAxis *senderAxis = qobject_cast<QCPAxis*>(sender()))
       if (senderAxis->axisType() == type)
@@ -20674,14 +20674,14 @@ void QCPColorScaleAxisRectPrivate::axisSelectionChanged(QCPAxis::SelectableParts
 
 /*! \internal
 
-  This slot is connected to the selectableChanged signals of the four axes in the constructor. It
+  This slot is connected to the selectableChanged Q_SIGNALS of the four axes in the constructor. It
   synchronizes the selectability of the axes.
 */
 void QCPColorScaleAxisRectPrivate::axisSelectableChanged(QCPAxis::SelectableParts selectableParts)
 {
   // synchronize axis base selectability:
   const QList<QCPAxis::AxisType> allAxisTypes = QList<QCPAxis::AxisType>() << QCPAxis::atBottom << QCPAxis::atTop << QCPAxis::atLeft << QCPAxis::atRight;
-  foreach (QCPAxis::AxisType type, allAxisTypes)
+  Q_FOREACH (QCPAxis::AxisType type, allAxisTypes)
   {
     if (QCPAxis *senderAxis = qobject_cast<QCPAxis*>(sender()))
       if (senderAxis->axisType() == type)
@@ -21577,7 +21577,7 @@ void QCPGraph::drawFill(QCPPainter *painter, QVector<QPointF> *lines) const
   if (!mChannelFillGraph)
   {
     // draw base fill under graph, fill goes all the way to the zero-value-line:
-    foreach (QCPDataRange segment, segments)
+    Q_FOREACH (QCPDataRange segment, segments)
       painter->drawPolygon(getFillPolygon(lines, segment));
   } else
   {
@@ -21605,7 +21605,7 @@ void QCPGraph::drawScatterPlot(QCPPainter *painter, const QVector<QPointF> &scat
 {
   applyScattersAntialiasingHint(painter);
   style.applyTo(painter, mPen);
-  foreach (const QPointF &scatter, scatters)
+  Q_FOREACH (const QPointF &scatter, scatters)
     style.drawShape(painter, scatter.x(), scatter.y());
 }
 
@@ -22997,7 +22997,7 @@ void QCPCurve::drawScatterPlot(QCPPainter *painter, const QVector<QPointF> &poin
   // draw scatter point symbols:
   applyScattersAntialiasingHint(painter);
   style.applyTo(painter, mPen);
-  foreach (const QPointF &point, points)
+  Q_FOREACH (const QPointF &point, points)
     if (!qIsNaN(point.x()) && !qIsNaN(point.y()))
       style.drawShape(painter,  point);
 }
@@ -24052,7 +24052,7 @@ QCPBars *QCPBarsGroup::bars(int index) const
 void QCPBarsGroup::clear()
 {
   const QList<QCPBars*> oldBars = mBars;
-  foreach (QCPBars *bars, oldBars)
+  Q_FOREACH (QCPBars *bars, oldBars)
     bars->setBarsGroup(nullptr); // removes itself from mBars via removeBars
 }
 
@@ -24154,7 +24154,7 @@ double QCPBarsGroup::keyPixelOffset(const QCPBars *bars, double keyCoord)
 {
   // find list of all base bars in case some mBars are stacked:
   QList<const QCPBars*> baseBars;
-  foreach (const QCPBars *b, mBars)
+  Q_FOREACH (const QCPBars *b, mBars)
   {
     while (b->barBelow())
       b = b->barBelow();
@@ -25533,7 +25533,7 @@ double QCPStatisticalBox::selectTest(const QPointF &pos, bool onlySelectable, QV
       {
         const QVector<QLineF> whiskerBackbones = getWhiskerBackboneLines(it);
         const QCPVector2D posVec(pos);
-        foreach (const QLineF &backbone, whiskerBackbones)
+        Q_FOREACH (const QLineF &backbone, whiskerBackbones)
         {
           double currentDistSqr = posVec.distanceSquaredToLine(backbone);
           if (currentDistSqr < minDistSqr)
@@ -26373,30 +26373,30 @@ bool QCPColorMapData::createAlpha(bool initializeOpaque)
 
 /* end documentation of inline functions */
 
-/* start documentation of signals */
+/* start documentation of Q_SIGNALS */
 
 /*! \fn void QCPColorMap::dataRangeChanged(const QCPRange &newRange);
   
-  This signal is emitted when the data range changes.
+  This signal is Q_EMITted when the data range changes.
   
   \see setDataRange
 */
 
 /*! \fn void QCPColorMap::dataScaleTypeChanged(QCPAxis::ScaleType scaleType);
   
-  This signal is emitted when the data scale type changes.
+  This signal is Q_EMITted when the data scale type changes.
   
   \see setDataScaleType
 */
 
 /*! \fn void QCPColorMap::gradientChanged(const QCPColorGradient &newGradient);
   
-  This signal is emitted when the gradient changes.
+  This signal is Q_EMITted when the gradient changes.
   
   \see setGradient
 */
 
-/* end documentation of signals */
+/* end documentation of Q_SIGNALS */
 
 /*!
   Constructs a color map with the specified \a keyAxis and \a valueAxis.
@@ -26464,7 +26464,7 @@ void QCPColorMap::setDataRange(const QCPRange &dataRange)
     else
       mDataRange = dataRange.sanitizedForLinScale();
     mMapImageInvalidated = true;
-    emit dataRangeChanged(mDataRange);
+    Q_EMIT dataRangeChanged(mDataRange);
   }
 }
 
@@ -26479,7 +26479,7 @@ void QCPColorMap::setDataScaleType(QCPAxis::ScaleType scaleType)
   {
     mDataScaleType = scaleType;
     mMapImageInvalidated = true;
-    emit dataScaleTypeChanged(mDataScaleType);
+    Q_EMIT dataScaleTypeChanged(mDataScaleType);
     if (mDataScaleType == QCPAxis::stLogarithmic)
       setDataRange(mDataRange.sanitizedForLogScale());
   }
@@ -26502,7 +26502,7 @@ void QCPColorMap::setGradient(const QCPColorGradient &gradient)
   {
     mGradient = gradient;
     mMapImageInvalidated = true;
-    emit gradientChanged(mGradient);
+    Q_EMIT gradientChanged(mGradient);
   }
 }
 
@@ -26550,7 +26550,7 @@ void QCPColorMap::setTightBoundary(bool enabled)
 */
 void QCPColorMap::setColorScale(QCPColorScale *colorScale)
 {
-  if (mColorScale) // unconnect signals from old color scale
+  if (mColorScale) // unconnect Q_SIGNALS from old color scale
   {
     disconnect(this, SIGNAL(dataRangeChanged(QCPRange)), mColorScale.data(), SLOT(setDataRange(QCPRange)));
     disconnect(this, SIGNAL(dataScaleTypeChanged(QCPAxis::ScaleType)), mColorScale.data(), SLOT(setDataScaleType(QCPAxis::ScaleType)));
@@ -26560,7 +26560,7 @@ void QCPColorMap::setColorScale(QCPColorScale *colorScale)
     disconnect(mColorScale.data(), SIGNAL(dataScaleTypeChanged(QCPAxis::ScaleType)), this, SLOT(setDataScaleType(QCPAxis::ScaleType)));
   }
   mColorScale = colorScale;
-  if (mColorScale) // connect signals to new color scale
+  if (mColorScale) // connect Q_SIGNALS to new color scale
   {
     setGradient(mColorScale.data()->gradient());
     setDataRange(mColorScale.data()->dataRange());
@@ -28246,7 +28246,7 @@ QCPDataSelection QCPErrorBars::selectTestRect(const QRectF &rect, bool onlySelec
     backbones.clear();
     whiskers.clear();
     getErrorBarLines(it, backbones, whiskers);
-    foreach (const QLineF &backbone, backbones)
+    Q_FOREACH (const QLineF &backbone, backbones)
     {
       if (rectIntersectsLine(rect, backbone))
       {
@@ -28722,7 +28722,7 @@ double QCPErrorBars::pointDistance(const QPointF &pixelPoint, QCPErrorBarsDataCo
   for (QCPErrorBarsDataContainer::const_iterator it=begin; it!=end; ++it)
   {
     getErrorBarLines(it, backbones, whiskers);
-    foreach (const QLineF &backbone, backbones)
+    Q_FOREACH (const QLineF &backbone, backbones)
     {
       const double currentDistSqr = QCPVector2D(pixelPoint).distanceSquaredToLine(backbone);
       if (currentDistSqr < minDistSqr)
@@ -31012,11 +31012,11 @@ QPen QCPItemBracket::mainPen() const
 */
 
 /* end of documentation of inline functions */
-/* start of documentation of signals */
+/* start of documentation of Q_SIGNALS */
 
 /*! \fn void QCPPolarAxisRadial::rangeChanged(const QCPRange &newRange)
 
-  This signal is emitted when the range of this axis has changed. You can connect it to the \ref
+  This signal is Q_EMITted when the range of this axis has changed. You can connect it to the \ref
   setRange slot of another axis to communicate the new range to the other axis, in order for it to
   be synchronized.
   
@@ -31038,21 +31038,21 @@ QPen QCPItemBracket::mainPen() const
 
 /*! \fn void QCPPolarAxisRadial::scaleTypeChanged(QCPPolarAxisRadial::ScaleType scaleType);
   
-  This signal is emitted when the scale type changes, by calls to \ref setScaleType
+  This signal is Q_EMITted when the scale type changes, by calls to \ref setScaleType
 */
 
 /*! \fn void QCPPolarAxisRadial::selectionChanged(QCPPolarAxisRadial::SelectableParts selection)
   
-  This signal is emitted when the selection state of this axis has changed, either by user interaction
+  This signal is Q_EMITted when the selection state of this axis has changed, either by user interaction
   or by a direct call to \ref setSelectedParts.
 */
 
 /*! \fn void QCPPolarAxisRadial::selectableChanged(const QCPPolarAxisRadial::SelectableParts &parts);
   
-  This signal is emitted when the selectability changes, by calls to \ref setSelectableParts
+  This signal is Q_EMITted when the selectability changes, by calls to \ref setSelectableParts
 */
 
-/* end of documentation of signals */
+/* end of documentation of Q_SIGNALS */
 
 /*!
   Constructs an Axis instance of Type \a type for the axis rect \a parent.
@@ -31219,7 +31219,7 @@ void QCPPolarAxisRadial::setScaleType(QCPPolarAxisRadial::ScaleType type)
     if (mScaleType == stLogarithmic)
       setRange(mRange.sanitizedForLogScale());
     //mCachedMarginValid = false;
-    emit scaleTypeChanged(mScaleType);
+    Q_EMIT scaleTypeChanged(mScaleType);
   }
 }
 
@@ -31245,8 +31245,8 @@ void QCPPolarAxisRadial::setRange(const QCPRange &range)
   {
     mRange = range.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -31264,7 +31264,7 @@ void QCPPolarAxisRadial::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    emit selectableChanged(mSelectableParts);
+    Q_EMIT selectableChanged(mSelectableParts);
   }
 }
 
@@ -31278,7 +31278,7 @@ void QCPPolarAxisRadial::setSelectableParts(const SelectableParts &selectable)
   
   This function can change the selection state of a part, independent of the \ref setSelectableParts setting.
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see SelectablePart, setSelectableParts, selectTest, setSelectedBasePen, setSelectedTickPen, setSelectedSubTickPen,
   setSelectedTickLabelFont, setSelectedLabelFont, setSelectedTickLabelColor, setSelectedLabelColor
@@ -31288,7 +31288,7 @@ void QCPPolarAxisRadial::setSelectedParts(const SelectableParts &selected)
   if (mSelectedParts != selected)
   {
     mSelectedParts = selected;
-    emit selectionChanged(mSelectedParts);
+    Q_EMIT selectionChanged(mSelectedParts);
   }
 }
 
@@ -31317,8 +31317,8 @@ void QCPPolarAxisRadial::setRange(double lower, double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -31360,8 +31360,8 @@ void QCPPolarAxisRadial::setRangeLower(double lower)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -31382,8 +31382,8 @@ void QCPPolarAxisRadial::setRangeUpper(double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -31895,8 +31895,8 @@ void QCPPolarAxisRadial::moveRange(double diff)
     mRange.lower *= diff;
     mRange.upper *= diff;
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -31944,8 +31944,8 @@ void QCPPolarAxisRadial::scaleRange(double factor, double center)
     } else
       qDebug() << Q_FUNC_INFO << "Center of scaling operation doesn't lie in same logarithmic sign domain as range:" << center;
   }
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -32778,8 +32778,8 @@ void QCPPolarAxisAngular::moveRange(double diff)
   QCPRange oldRange = mRange;
   mRange.lower += diff;
   mRange.upper += diff;
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -32813,8 +32813,8 @@ void QCPPolarAxisAngular::scaleRange(double factor, double center)
   newRange.upper = (mRange.upper-center)*factor + center;
   if (QCPRange::validRange(newRange))
     mRange = newRange.sanitizedForLinScale();
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -33185,8 +33185,8 @@ void QCPPolarAxisAngular::setRange(const QCPRange &range)
   if (!QCPRange::validRange(range)) return;
   QCPRange oldRange = mRange;
   mRange = range.sanitizedForLinScale();
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -33204,7 +33204,7 @@ void QCPPolarAxisAngular::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    emit selectableChanged(mSelectableParts);
+    Q_EMIT selectableChanged(mSelectableParts);
   }
 }
 
@@ -33218,7 +33218,7 @@ void QCPPolarAxisAngular::setSelectableParts(const SelectableParts &selectable)
   
   This function can change the selection state of a part, independent of the \ref setSelectableParts setting.
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see SelectablePart, setSelectableParts, selectTest, setSelectedBasePen, setSelectedTickPen, setSelectedSubTickPen,
   setSelectedTickLabelFont, setSelectedLabelFont, setSelectedTickLabelColor, setSelectedLabelColor
@@ -33228,7 +33228,7 @@ void QCPPolarAxisAngular::setSelectedParts(const SelectableParts &selected)
   if (mSelectedParts != selected)
   {
     mSelectedParts = selected;
-    emit selectionChanged(mSelectedParts);
+    Q_EMIT selectionChanged(mSelectedParts);
   }
 }
 
@@ -33251,8 +33251,8 @@ void QCPPolarAxisAngular::setRange(double lower, double upper)
   mRange.lower = lower;
   mRange.upper = upper;
   mRange = mRange.sanitizedForLinScale();
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -33288,8 +33288,8 @@ void QCPPolarAxisAngular::setRangeLower(double lower)
   QCPRange oldRange = mRange;
   mRange.lower = lower;
   mRange = mRange.sanitizedForLinScale();
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -33304,8 +33304,8 @@ void QCPPolarAxisAngular::setRangeUpper(double upper)
   QCPRange oldRange = mRange;
   mRange.upper = upper;
   mRange = mRange.sanitizedForLinScale();
-  emit rangeChanged(mRange);
-  emit rangeChanged(mRange, oldRange);
+  Q_EMIT rangeChanged(mRange);
+  Q_EMIT rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -34569,11 +34569,11 @@ void QCPPolarGraph::setSelectable(QCP::SelectionType selectable)
     mSelectable = selectable;
     QCPDataSelection oldSelection = mSelection;
     mSelection.enforceType(mSelectable);
-    emit selectableChanged(mSelectable);
+    Q_EMIT selectableChanged(mSelectable);
     if (mSelection != oldSelection)
     {
-      emit selectionChanged(selected());
-      emit selectionChanged(mSelection);
+      Q_EMIT selectionChanged(selected());
+      Q_EMIT selectionChanged(mSelection);
     }
   }
 }
@@ -34592,7 +34592,7 @@ void QCPPolarGraph::setSelectable(QCP::SelectionType selectable)
   QCP::SelectionType set via \ref setSelectable, the resulting selection will be adjusted
   accordingly (see \ref QCPDataSelection::enforceType).
   
-  emits the \ref selectionChanged signal when \a selected is different from the previous selection state.
+  Q_EMITs the \ref selectionChanged signal when \a selected is different from the previous selection state.
   
   \see setSelectable, selectTest
 */
@@ -34602,8 +34602,8 @@ void QCPPolarGraph::setSelection(QCPDataSelection selection)
   if (mSelection != selection)
   {
     mSelection = selection;
-    emit selectionChanged(selected());
-    emit selectionChanged(mSelection);
+    Q_EMIT selectionChanged(selected());
+    Q_EMIT selectionChanged(mSelection);
   }
 }
 

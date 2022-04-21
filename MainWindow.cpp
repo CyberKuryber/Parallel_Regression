@@ -35,7 +35,7 @@ MainWindow::MainWindow(const QString &title) {
     this->input_x_max->setMinimum(-100);
     this->input_x_min->setMinimum(-100);
     //dummy values
-    this->input_points->setValue(1000);
+    this->input_points->setValue(50);
     this->input_y_err->setValue(2);
     this->input_x_err->setValue(5);
     this->input_x_max->setValue(5);
@@ -71,8 +71,9 @@ MainWindow::MainWindow(const QString &title) {
 
 std::vector<double> uniform_dots(double x_min, double x_max, double count) {
     std::vector<double> x;
-    for (int i = x_min; i < x_max; i += (x_max - x_min) / count) {
+    for (double i = x_min; i < x_max; ) {
         x.push_back(i);
+        i += (x_max - x_min) / count;
     }
     return x;
 }
@@ -95,19 +96,25 @@ void MainWindow::handle_serial() {
         x.push_back(i->get_x());
         y_approx.push_back(i->get_y());
         y_original.push_back(input_handler.calculate_original(i->get_x()));
+//        y_original.push_back(generated_points[j].get_y());
+//        j++;
     }
 // create graph and assign data to it:
     QCustomPlot *customPlot = new QCustomPlot();
     customPlot->addGraph();
     customPlot->graph(0)->setData(x, y_original);
+    customPlot->addGraph();
     customPlot->graph(1)->setData(x, y_approx);
+    customPlot->graph(1)->setPen(QPen(Qt::red));
 // give the axes some labels:
     customPlot->xAxis->setLabel("x");
     customPlot->yAxis->setLabel("y");
 // set axes ranges, so we see all data:
-    customPlot->xAxis->setRange(-1, 1);
-    customPlot->yAxis->setRange(0, 1);
+//    customPlot->xAxis->setRange(input_x_min->value(), input_x_min->value());
+//    customPlot->yAxis->setRange(0, 1);
     customPlot->replot();
+    customPlot->resize(200,200);
+    customPlot->show();
 
 }
 

@@ -5,12 +5,20 @@
 #include "InputHandler.h"
 
 void InputHandler::parse_input() {
-    std::ifstream infile(INPUT_FILE);
+    std::ifstream infile;
+    infile.open(INPUT_FILE);
+
+    if (!infile.is_open()) {
+        std::cout << "Couldn't open file " << INPUT_FILE << std::endl;
+        std::exit(-2);
+    }
+
     std::string s;
-    infile >> s;
     std::string delimiter = "|";
+    getline(infile, s);
     this->a = std::stod(s.substr(0, s.find(delimiter)));
     this->b = std::stod(s.substr(1, s.find(delimiter)));
+    infile.close();
 }
 
 tbb::concurrent_vector<Point> points;
@@ -26,11 +34,14 @@ struct Shaker {
         short data;
         for (int i = range.begin(); i != range.end(); ++i) {
             srand(time(NULL));
-            double x_rand = rand() % 101 - 50;
-            double y_rand = rand() % 101 - 50;
-
-            double new_x = increment * (i + 1) + x_error * x_rand / 100 * increment * (i + 1);
-            double new_y = (a * increment * (i + 1) + b) + y_error * y_rand / 100 * (a * increment * (i + 1) + b);
+            double x_rand = (rand() % 101 - 50)/100.0;
+            double y_rand = (rand() % 101 - 50)/100.0;
+            double new_x = increment * (i + 1);
+            double calculated_x_err = x_error * x_rand / 100 *new_x;
+            new_x += calculated_x_err;
+            double new_y = (a * increment * (i + 1) + b);
+            double calculated_y_err =  y_error * y_rand / 100 * new_y;
+            new_y+= calculated_y_err;
 
 
             points.push_back(Point(new_x, new_y));
@@ -45,7 +56,7 @@ struct Shaker {
 
 tbb::concurrent_vector<Point>
 InputHandler::generate_dots(double x_min, double x_max, double x_error, double y_error, int point_count) {
-    Shaker shaker(a, b, x_max - x_min, x_error, y_error);
+    Shaker shaker(a, b, (x_max - x_min)/point_count, x_error, y_error);
 
     tbb::parallel_for(tbb::blocked_range<int>(0, point_count), shaker);
     return points;

@@ -22,6 +22,7 @@ public:
 void handle_serial();
 //     ~MainWindow();
 
+
 private:
     QLabel *label_x_min;
     QLabel *label_x_max;

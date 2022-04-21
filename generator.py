@@ -12,5 +12,5 @@ rnd_b = random.random()
 b = rnd_b * (b_upper - b_lower) + b_lower
 
 input_file = open("input_file", "w")
-input_file.write(str(a) + "|" + str(b))
+input_file.write(str(a) + "\n" + str(b))
 input_file.close()

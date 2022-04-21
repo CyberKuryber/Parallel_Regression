@@ -11,10 +11,11 @@
 #include "tbb/parallel_for.h"
 #include "Point.h"
 #include <string>
+#include <iostream>
 #include <fstream>
 #include "time.h"
 
-#define INPUT_FILE "input_file"
+#define INPUT_FILE "../input_file"
 
 class InputHandler {
 private:
