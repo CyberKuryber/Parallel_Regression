@@ -7,11 +7,12 @@
 
 #include <vector>
 #include <cmath>
+#include "tbb/concurrent_vector.h"
 #include "Point.h"
 
 class SerialLinearRegression {
 public:
-    void calculate_Function(std::vector<Point> &points);
+    void calculate_Function(tbb::concurrent_vector<Point> &points);
 
     std::vector<Point> calculate_points(std::vector<double> &x);
 

@@ -51,3 +51,7 @@ InputHandler::generate_dots(double x_min, double x_max, double x_error, double y
     return points;
 
 }
+
+double InputHandler::calculate_original(double x) const {
+    return this->a*x + this->b;
+}

@@ -11,11 +11,15 @@
 #include "QGridLayout"
 #include "QSpinBox"
 #include "QLabel"
+#include "qcustomplot.h"
+#include "SerialLinearRegression.h"
+#include "InputHandler.h"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
 public:
     MainWindow(const QString &title);
+void handle_serial();
 //     ~MainWindow();
 
 private:
@@ -33,6 +37,8 @@ private:
     QPushButton *button_serial;
     QPushButton *button_for;
     QPushButton *button_task;
+    InputHandler input_handler;
+    SerialLinearRegression serial_linear_regression;
 
 };
 

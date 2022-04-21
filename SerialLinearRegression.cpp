@@ -4,7 +4,7 @@
 
 #include "SerialLinearRegression.h"
 
-void SerialLinearRegression::calculate_Function(std::vector<Point> &points) {
+void SerialLinearRegression::calculate_Function(tbb::concurrent_vector<Point> &points) {
     double x_sum = 0, x2_sum = 0, y_sum = 0, x_ysum = 0;
     int n = points.size();
     for (int i = 0; i < n; i++) {
