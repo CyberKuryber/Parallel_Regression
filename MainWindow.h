@@ -14,12 +14,14 @@
 #include "qcustomplot.h"
 #include "SerialLinearRegression.h"
 #include "InputHandler.h"
+#include "tbb/tick_count.h"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
 public:
     MainWindow(const QString &title);
 void handle_serial();
+void handle_for();
 //     ~MainWindow();
 
 

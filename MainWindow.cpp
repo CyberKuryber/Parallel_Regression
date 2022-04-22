@@ -71,12 +71,89 @@ MainWindow::MainWindow(const QString &title) {
 
 std::vector<double> uniform_dots(double x_min, double x_max, double count) {
     std::vector<double> x;
-    for (double i = x_min; i < x_max; ) {
+    for (double i = x_min; i < x_max;) {
         x.push_back(i);
         i += (x_max - x_min) / count;
     }
     return x;
 }
+
+void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb::tick_count::interval_t timer) {
+    QVector<double> x, y_original, y_approx; // initialize with entries 0..100
+    for (auto i = points.begin(); i != points.end(); i++) {
+        x.push_back(i->get_x());
+        y_approx.push_back(i->get_y());
+        y_original.push_back(input_handler.calculate_original(i->get_x()));
+//        y_original.push_back(generated_points[j].get_y());
+//        j++;
+    }
+// create graph and assign data to it:
+    QCustomPlot *custom_plot = new QCustomPlot();
+    custom_plot->addGraph();
+    custom_plot->graph(0)->setData(x, y_original);
+    custom_plot->addGraph();
+    custom_plot->graph(1)->setData(x, y_approx);
+    custom_plot->graph(1)->setPen(QPen(Qt::red));
+// give the axes some labels:
+    custom_plot->xAxis->setLabel("x");
+    custom_plot->yAxis->setLabel("y");
+// set axes ranges, so we see all data:
+//    custom_plot->xAxis->setRange(input_x_min->value(), input_x_min->value());
+//    custom_plot->yAxis->setRange(0, 1);
+    custom_plot->replot();
+    custom_plot->resize(1000, 1000);
+//    custom_plot->show();
+
+    QWidget *widget = new QWidget();
+    QGridLayout *layout = new QGridLayout();
+    std::string s = "Time: " + std::to_string(timer.seconds()*1000) + "ms";
+    QLabel *label = new QLabel(s.c_str());
+    layout->addWidget(custom_plot,0,0);
+    layout->addWidget(label,1,0);
+    widget->setLayout(layout);
+    widget->resize(1000,1000);
+    widget->show();
+
+}
+void render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer) {
+    QVector<double> x, y_original, y_approx; // initialize with entries 0..100
+    for (auto i = points.begin(); i != points.end(); i++) {
+        x.push_back(i->get_x());
+        y_approx.push_back(i->get_y());
+        y_original.push_back(input_handler.calculate_original(i->get_x()));
+//        y_original.push_back(generated_points[j].get_y());
+//        j++;
+    }
+// create graph and assign data to it:
+    QCustomPlot *custom_plot = new QCustomPlot();
+    custom_plot->addGraph();
+    custom_plot->graph(0)->setData(x, y_original);
+    custom_plot->addGraph();
+    custom_plot->graph(1)->setData(x, y_approx);
+    custom_plot->graph(1)->setPen(QPen(Qt::red));
+// give the axes some labels:
+    custom_plot->xAxis->setLabel("x");
+    custom_plot->yAxis->setLabel("y");
+// set axes ranges, so we see all data:
+//    custom_plot->xAxis->setRange(input_x_min->value(), input_x_min->value());
+//    custom_plot->yAxis->setRange(0, 1);
+    custom_plot->replot();
+    custom_plot->resize(1000, 1000);
+//    custom_plot->show();
+
+    QWidget *widget = new QWidget();
+    QGridLayout *layout = new QGridLayout();
+    std::string s = "Time: " + std::to_string(timer.seconds()*1000) + "ms";
+    QLabel *label = new QLabel(s.c_str());
+    layout->addWidget(custom_plot,0,0);
+    layout->addWidget(label,1,0);
+    widget->setLayout(layout);
+    widget->resize(1000,1000);
+    widget->show();
+
+}
+
+
 
 
 void MainWindow::handle_serial() {
@@ -85,36 +162,18 @@ void MainWindow::handle_serial() {
              input_points->value());
 
     std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
+    tbb::tick_count start_time = tbb::tick_count::now();
     serial_linear_regression.calculate_Function(generated_points);
-
+    tbb::tick_count end_time = tbb::tick_count::now();
 
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
-
+    render_window(input_handler, points,(end_time - start_time));
     // generate some data:
-    QVector<double> x, y_original, y_approx; // initialize with entries 0..100
-    for (auto i = points.begin();i != points.end();i++) {
-        x.push_back(i->get_x());
-        y_approx.push_back(i->get_y());
-        y_original.push_back(input_handler.calculate_original(i->get_x()));
-//        y_original.push_back(generated_points[j].get_y());
-//        j++;
-    }
-// create graph and assign data to it:
-    QCustomPlot *customPlot = new QCustomPlot();
-    customPlot->addGraph();
-    customPlot->graph(0)->setData(x, y_original);
-    customPlot->addGraph();
-    customPlot->graph(1)->setData(x, y_approx);
-    customPlot->graph(1)->setPen(QPen(Qt::red));
-// give the axes some labels:
-    customPlot->xAxis->setLabel("x");
-    customPlot->yAxis->setLabel("y");
-// set axes ranges, so we see all data:
-//    customPlot->xAxis->setRange(input_x_min->value(), input_x_min->value());
-//    customPlot->yAxis->setRange(0, 1);
-    customPlot->replot();
-    customPlot->resize(200,200);
-    customPlot->show();
+
+
+}
+
+void MainWindow::handle_for() {
 
 }
 
