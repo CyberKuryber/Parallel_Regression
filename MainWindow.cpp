@@ -164,9 +164,8 @@ void MainWindow::handle_serial() {
     std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
     tbb::tick_count start_time = tbb::tick_count::now();
     serial_linear_regression.calculate_Function(generated_points);
-    tbb::tick_count end_time = tbb::tick_count::now();
-
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
+    tbb::tick_count end_time = tbb::tick_count::now();
     render_window(input_handler, points,(end_time - start_time));
     // generate some data:
 

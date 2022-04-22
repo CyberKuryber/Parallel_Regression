@@ -31,7 +31,6 @@ struct Shaker {
     double b;
 
     void operator()(const tbb::blocked_range<int> &range) const {
-        short data;
         for (int i = range.begin(); i != range.end(); ++i) {
             srand(time(NULL));
             double x_rand = (rand() % 101 - 50)/100.0;
