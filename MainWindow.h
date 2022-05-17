@@ -13,8 +13,10 @@
 #include "QLabel"
 #include "qcustomplot.h"
 #include "SerialLinearRegression.h"
+#include "ForParallelRegression.h"
 #include "InputHandler.h"
 #include "tbb/tick_count.h"
+#include "iostream"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -42,6 +44,7 @@ private:
     QPushButton *button_task;
     InputHandler input_handler;
     SerialLinearRegression serial_linear_regression;
+    ForParallelRegression for_parallel_regression;
 
 };
 

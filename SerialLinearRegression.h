@@ -16,7 +16,7 @@ public:
 
     std::vector<Point> calculate_points(std::vector<double> &x);
 
-private:
+//private:
     double a;
     double b;
 

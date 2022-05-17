@@ -31,7 +31,7 @@ MainWindow::MainWindow(const QString &title) {
     this->button_for->resize(100, 100);
     this->button_serial->resize(100, 100);
 
-    this->input_points->setMaximum(10000);
+    this->input_points->setMaximum(10000000);
     this->input_x_max->setMinimum(-100);
     this->input_x_min->setMinimum(-100);
     //dummy values
@@ -67,10 +67,20 @@ MainWindow::MainWindow(const QString &title) {
 
 
     connect(button_serial, &QPushButton::released, this, &MainWindow::handle_serial);
+    connect(button_for, &QPushButton::released, this, &MainWindow::handle_for);
 }
 
 std::vector<double> uniform_dots(double x_min, double x_max, double count) {
     std::vector<double> x;
+    for (double i = x_min; i < x_max;) {
+        x.push_back(i);
+        i += (x_max - x_min) / count;
+    }
+    return x;
+}
+
+tbb::concurrent_vector<double> uniform_dots(double x_min, double x_max, double count,bool isConcurrent) {
+    tbb::concurrent_vector<double> x;
     for (double i = x_min; i < x_max;) {
         x.push_back(i);
         i += (x_max - x_min) / count;
@@ -167,13 +177,24 @@ void MainWindow::handle_serial() {
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
     render_window(input_handler, points,(end_time - start_time));
+    std::cout<<serial_linear_regression.a<<","<<serial_linear_regression.b<<std::endl;
     // generate some data:
 
 
 }
 
 void MainWindow::handle_for() {
+    tbb::concurrent_vector<Point> generated_points = input_handler.generate_dots
+            (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
+             input_points->value());
 
+    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value(), true);
+    tbb::tick_count start_time = tbb::tick_count::now();
+    for_parallel_regression.calculate_Function(generated_points);
+    tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(x_uniform);
+    tbb::tick_count end_time = tbb::tick_count::now();
+    render_window(input_handler, points,(end_time - start_time));
+    std::cout<<for_parallel_regression.a<<","<<for_parallel_regression.b<<std::endl;
 }
 
 //MainWindow::~MainWindow() noexcept {
