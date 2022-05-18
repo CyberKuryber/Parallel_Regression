@@ -17,13 +17,17 @@
 #include "InputHandler.h"
 #include "tbb/tick_count.h"
 #include "iostream"
+#include "TaskParallelRegression.h"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
 public:
     MainWindow(const QString &title);
-void handle_serial();
-void handle_for();
+    void handle_serial();
+    void handle_for();
+    void handle_task();
+    void generate_points();
+
 //     ~MainWindow();
 
 
@@ -45,6 +49,8 @@ private:
     InputHandler input_handler;
     SerialLinearRegression serial_linear_regression;
     ForParallelRegression for_parallel_regression;
+    TaskParallelRegression task_parallel_regression;
+    tbb::concurrent_vector<Point> generated_points;
 
 };
 

@@ -68,6 +68,7 @@ MainWindow::MainWindow(const QString &title) {
 
     connect(button_serial, &QPushButton::released, this, &MainWindow::handle_serial);
     connect(button_for, &QPushButton::released, this, &MainWindow::handle_for);
+    connect(button_task, &QPushButton::released, this, &MainWindow::handle_task);
 }
 
 std::vector<double> uniform_dots(double x_min, double x_max, double count) {
@@ -79,7 +80,7 @@ std::vector<double> uniform_dots(double x_min, double x_max, double count) {
     return x;
 }
 
-tbb::concurrent_vector<double> uniform_dots(double x_min, double x_max, double count,bool isConcurrent) {
+tbb::concurrent_vector<double> uniform_dots(double x_min, double x_max, double count, bool isConcurrent) {
     tbb::concurrent_vector<double> x;
     for (double i = x_min; i < x_max;) {
         x.push_back(i);
@@ -116,16 +117,18 @@ void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb:
 
     QWidget *widget = new QWidget();
     QGridLayout *layout = new QGridLayout();
-    std::string s = "Time: " + std::to_string(timer.seconds()*1000) + "ms";
+    std::string s = "Time: " + std::to_string(timer.seconds() * 1000) + "ms";
     QLabel *label = new QLabel(s.c_str());
-    layout->addWidget(custom_plot,0,0);
-    layout->addWidget(label,1,0);
+    layout->addWidget(custom_plot, 0, 0);
+    layout->addWidget(label, 1, 0);
     widget->setLayout(layout);
-    widget->resize(1000,1000);
+    widget->resize(1000, 1000);
     widget->show();
 
 }
-void render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer) {
+
+void
+render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer) {
     QVector<double> x, y_original, y_approx; // initialize with entries 0..100
     for (auto i = points.begin(); i != points.end(); i++) {
         x.push_back(i->get_x());
@@ -153,49 +156,66 @@ void render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &p
 
     QWidget *widget = new QWidget();
     QGridLayout *layout = new QGridLayout();
-    std::string s = "Time: " + std::to_string(timer.seconds()*1000) + "ms";
+    std::string s = "Time: " + std::to_string(timer.seconds() * 1000) + "ms";
     QLabel *label = new QLabel(s.c_str());
-    layout->addWidget(custom_plot,0,0);
-    layout->addWidget(label,1,0);
+    layout->addWidget(custom_plot, 0, 0);
+    layout->addWidget(label, 1, 0);
     widget->setLayout(layout);
-    widget->resize(1000,1000);
+    widget->resize(1000, 1000);
     widget->show();
 
 }
 
 
-
-
 void MainWindow::handle_serial() {
-    tbb::concurrent_vector<Point> generated_points = input_handler.generate_dots
-            (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
-             input_points->value());
+    this->generate_points();
 
     std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
     tbb::tick_count start_time = tbb::tick_count::now();
     serial_linear_regression.calculate_Function(generated_points);
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points,(end_time - start_time));
-    std::cout<<serial_linear_regression.a<<","<<serial_linear_regression.b<<std::endl;
+    render_window(input_handler, points, (end_time - start_time));
+    std::cout << serial_linear_regression.a << "," << serial_linear_regression.b << std::endl;
     // generate some data:
 
 
 }
 
 void MainWindow::handle_for() {
-    tbb::concurrent_vector<Point> generated_points = input_handler.generate_dots
-            (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
-             input_points->value());
+    this->generate_points();
 
-    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value(), true);
+    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
+                                                            input_points->value(), true);
     tbb::tick_count start_time = tbb::tick_count::now();
     for_parallel_regression.calculate_Function(generated_points);
     tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points,(end_time - start_time));
-    std::cout<<for_parallel_regression.a<<","<<for_parallel_regression.b<<std::endl;
+    render_window(input_handler, points, (end_time - start_time));
+    std::cout << for_parallel_regression.a << "," << for_parallel_regression.b << std::endl;
 }
+
+void MainWindow::generate_points() {
+    if (generated_points.size() != 0) return;
+    this->generated_points = input_handler.generate_dots
+            (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
+             input_points->value());
+}
+
+void MainWindow::handle_task() {
+    this->generate_points();
+
+    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
+                                                            input_points->value(), true);
+    tbb::tick_count start_time = tbb::tick_count::now();
+    task_parallel_regression.calculate_Function(generated_points);
+    tbb::concurrent_vector<Point> points = task_parallel_regression.calculate_points(x_uniform);
+    tbb::tick_count end_time = tbb::tick_count::now();
+    render_window(input_handler, points, (end_time - start_time));
+    std::cout << task_parallel_regression.a << "," << task_parallel_regression.b << std::endl;
+}
+
+
 
 //MainWindow::~MainWindow() noexcept {
 //    delete this->button_serial;
