@@ -88,7 +88,7 @@ tbb::concurrent_vector<Point> ForParallelRegression::calculate_points(tbb::concu
     PointsCalculator pointsCalculator(points, x, a, b);
     tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculator);
 
-    tbb::parallel_sort(points, less_than_point());
+  //  tbb::parallel_sort(points, less_than_point());
 
 
     return points;

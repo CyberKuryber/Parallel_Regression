@@ -30,7 +30,7 @@ public:
     double b;
 
 
-    double cutoff = 20;
+    double cutoff = 1000;
 };
 
 

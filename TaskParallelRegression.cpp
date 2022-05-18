@@ -4,6 +4,24 @@
 
 #include "TaskParallelRegression.h"
 
+struct PointsCalculator {
+    /**struct that enables to calculate uniform points using parallel for
+  @param uses previously generated points and uniformly distributed points on x axis
+ */
+    tbb::concurrent_vector<Point> &points;
+    tbb::concurrent_vector<double> &x;
+    double a, b;
+
+    void operator()(const tbb::blocked_range<int> &range) const {
+        for (int i = range.begin(); i != range.end(); ++i) {
+            points.push_back(Point(x[i], a * x[i] + b));
+        }
+    }
+
+    PointsCalculator(tbb::concurrent_vector<Point> &points, tbb::concurrent_vector<double> &x, double a, double b)
+            : points(points), x(x), a(a), b(b) {};
+};
+
 void TaskParallelRegression::calculate_Function(tbb::concurrent_vector<Point> &points) {
     /**
  * calculates parameters of approximated linear function
@@ -25,13 +43,12 @@ tbb::concurrent_vector<Point> TaskParallelRegression::calculate_points(tbb::conc
     /**
 * calculates points of approximated linear function
 * @param value uniformly distributed values of x axis
- * @return Points of approximated function calculated using param and previously calculated linear function params
+* @return Points of approximated function calculated using param and previously calculated linear function params
 */
-    tbb::concurrent_vector<Point> y;
-    for (auto value: x) {
-        y.push_back(Point(value, a * value + b));
-    }
-    return y;
+    tbb::concurrent_vector<Point> points;
+    PointsCalculator pointsCalculator(points, x, a, b);
+    tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculator);
+    return points;
 }
 
 std::vector<double>
