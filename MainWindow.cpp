@@ -210,7 +210,7 @@ void MainWindow::handle_for() {
 }
 
 void MainWindow::generate_points() {
-    if (generated_points.size() != 0) return;
+    if (generated_points.size() != 0 && generated_points.size() ==input_points->value()) return;
     this->generated_points = input_handler.generate_dots
             (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
              input_points->value());
