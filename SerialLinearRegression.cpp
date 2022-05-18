@@ -5,6 +5,10 @@
 #include "SerialLinearRegression.h"
 
 void SerialLinearRegression::calculate_Function(tbb::concurrent_vector<Point> &points) {
+    /**
+     * calculates parameters of approximated linear function
+     * @param value concurrent_vector point reference to previously generated points with error
+     */
     double x_sum = 0, x2_sum = 0, y_sum = 0, x_ysum = 0;
     int n = points.size();
     for (int i = 0; i < n; i++) {
@@ -21,6 +25,11 @@ void SerialLinearRegression::calculate_Function(tbb::concurrent_vector<Point> &p
 }
 
 std::vector<Point> SerialLinearRegression::calculate_points(std::vector<double> &x) {
+    /**
+ * calculates points of approximated linear function
+ * @param value uniformly distributed values of x axis
+     * @return Points of approximated function calculated using param and previously calculated linear function params
+ */
     std::vector<Point> y;
     for (auto value: x) {
         y.push_back(Point(value, a * value + b));

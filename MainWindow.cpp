@@ -5,6 +5,8 @@
 #include "MainWindow.h"
 
 MainWindow::MainWindow(const QString &title) {
+
+    //Main window constructor initializes all gui elements and connects buttons with event hadler functions
     this->setWindowTitle(title);
 
     this->button_serial = new QPushButton("Serial Least Squares", nullptr);
@@ -90,6 +92,10 @@ tbb::concurrent_vector<double> uniform_dots(double x_min, double x_max, double c
 }
 
 void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb::tick_count::interval_t timer) {
+    /**
+     * Renders window with graph of approximated and exact linear functions
+     * @param values Input handler class with parsed parameters, vector of approximated points, how much time approximation lasted
+     * */
     QVector<double> x, y_original, y_approx; // initialize with entries 0..100
     for (auto i = points.begin(); i != points.end(); i++) {
         x.push_back(i->get_x());
@@ -129,6 +135,10 @@ void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb:
 
 void
 render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer) {
+    /**
+ * Renders window with graph of approximated and exact linear functions
+ * @param values Input handler class with parsed parameters, concurrent_vector of approximated points, how much time approximation lasted
+ * */
     QVector<double> x, y_original, y_approx; // initialize with entries 0..100
     for (auto i = points.begin(); i != points.end(); i++) {
         x.push_back(i->get_x());
@@ -168,6 +178,8 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
 
 
 void MainWindow::handle_serial() {
+    // handle function for serial button
+
     this->generate_points();
 
     std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
@@ -183,6 +195,8 @@ void MainWindow::handle_serial() {
 }
 
 void MainWindow::handle_for() {
+    // handle function for parallel_for button
+
     this->generate_points();
 
     tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
@@ -203,6 +217,8 @@ void MainWindow::generate_points() {
 }
 
 void MainWindow::handle_task() {
+    // handle function for task parallel button
+
     this->generate_points();
 
     tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),

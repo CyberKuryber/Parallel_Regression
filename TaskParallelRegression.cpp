@@ -5,12 +5,16 @@
 #include "TaskParallelRegression.h"
 
 void TaskParallelRegression::calculate_Function(tbb::concurrent_vector<Point> &points) {
-    std::vector<double> s = calculate_sums(points,0,points.size());
+    /**
+ * calculates parameters of approximated linear function
+ * @param value concurrent_vector point reference to previously generated points with error
+ */
+    std::vector<double> s = calculate_sums(points, 0, points.size());
 
-    double x_ysum = s[3];
     double x_sum = s[0];
-    double x2_sum = s[2];
     double y_sum = s[1];
+    double x2_sum = s[2];
+    double x_ysum = s[3];
     double n = points.size();
 
     this->a = (n * x_ysum - x_sum * y_sum) / (n * x2_sum - x_sum * x_sum);
@@ -18,6 +22,11 @@ void TaskParallelRegression::calculate_Function(tbb::concurrent_vector<Point> &p
 }
 
 tbb::concurrent_vector<Point> TaskParallelRegression::calculate_points(tbb::concurrent_vector<double> &x) {
+    /**
+* calculates points of approximated linear function
+* @param value uniformly distributed values of x axis
+ * @return Points of approximated function calculated using param and previously calculated linear function params
+*/
     tbb::concurrent_vector<Point> y;
     for (auto value: x) {
         y.push_back(Point(value, a * value + b));
@@ -25,28 +34,39 @@ tbb::concurrent_vector<Point> TaskParallelRegression::calculate_points(tbb::conc
     return y;
 }
 
-std::vector<double>  TaskParallelRegression::calculate_sums(tbb::concurrent_vector<Point> &points, int start_idx, int stop_idx) {
+std::vector<double>
+TaskParallelRegression::calculate_sums(tbb::concurrent_vector<Point> &points, int start_idx, int stop_idx) {
+    /**
+ * Creates task group and recursivly splits length of this part of calculation on vector using start and stop index
+ * @param values concurrent_vector point reference to previously generated points with error first and last+1 index of this part of calculation
+     * @return sums of x,y,x^2,xy stored in vector
+ */
     tbb::task_group g;
-    std::vector<double>  first;
-    std::vector<double>  second;
-    int diff = (stop_idx-start_idx)/2;
-    if ((stop_idx- start_idx)>cutoff){
-        g.run([&] {first =  calculate_sums(points,start_idx,start_idx+diff);});
-        g.run([&] {second =  calculate_sums(points,start_idx+diff,stop_idx);});
+    std::vector<double> first;
+    std::vector<double> second;
+    int diff = (stop_idx - start_idx) / 2;
+    if ((stop_idx - start_idx) > cutoff) {
+        g.run([&] { first = calculate_sums(points, start_idx, start_idx + diff); });
+        g.run([&] { second = calculate_sums(points, start_idx + diff, stop_idx); });
         g.wait();
         for (int i = 0; i < 4; ++i) {
             first[i] += second[i];
         }
         return first;
-    }
-    else {
-        return sums(points,start_idx,stop_idx);
+    } else {
+        return sums(points, start_idx, stop_idx);
     }
 
 }
 
 std::vector<double> TaskParallelRegression::sums(tbb::concurrent_vector<Point> &points, int start_idx, int stop_idx) {
-    double x_sum=0, y_sum=0,x2_sum=0,x_ysum=0;
+    /**
+* Serially calculates sums on this part of the vector (called when split parts are too small)
+* @param values concurrent_vector point reference to previously generated points with error first and last+1 index of this part of calculation
+ * @return sums of x,y,x^2,xy stored in vector
+*/
+
+    double x_sum = 0, y_sum = 0, x2_sum = 0, x_ysum = 0;
 
     for (int i = start_idx; i < stop_idx; i++) {
         x_sum = x_sum + points[i].get_x();
@@ -54,7 +74,7 @@ std::vector<double> TaskParallelRegression::sums(tbb::concurrent_vector<Point> &
         x2_sum = x2_sum + pow(points[i].get_x(), 2);
         x_ysum = x_ysum + points[i].get_x() * points[i].get_y();
     }
-    std::vector<double> s ={x_sum,y_sum,x2_sum,x_ysum};
+    std::vector<double> s = {x_sum, y_sum, x2_sum, x_ysum};
     return s;
 }
 

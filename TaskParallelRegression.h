@@ -17,15 +17,17 @@
 class TaskParallelRegression {
 public:
     void calculate_Function(tbb::concurrent_vector<Point> &points);
+
     tbb::concurrent_vector<Point> calculate_points(tbb::concurrent_vector<double> &x);
+
     std::vector<double> calculate_sums(tbb::concurrent_vector<Point> &points, int start_idx, int stop_idx);
+
     std::vector<double> sums(tbb::concurrent_vector<Point> &points, int start_idx, int stop_idx);
 
 
 //private:
     double a;
     double b;
-
 
 
     double cutoff = 20;

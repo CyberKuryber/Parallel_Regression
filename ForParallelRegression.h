@@ -18,6 +18,7 @@
 class ForParallelRegression {
 public:
     void calculate_Function(tbb::concurrent_vector<Point> &points);
+
     tbb::concurrent_vector<Point> calculate_points(tbb::concurrent_vector<double> &x);
 
 //private:

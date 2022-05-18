@@ -23,9 +23,13 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 public:
     MainWindow(const QString &title);
+
     void handle_serial();
+
     void handle_for();
+
     void handle_task();
+
     void generate_points();
 
 //     ~MainWindow();
