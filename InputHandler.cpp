@@ -19,8 +19,26 @@ void InputHandler::parse_input() {
     std::string s;
     std::string delimiter = "|";
     getline(infile, s);
-    this->a = std::stod(s.substr(0, s.find(delimiter)));
-    this->b = std::stod(s.substr(1, s.find(delimiter)));
+    this->a = std::stod(s);
+    getline(infile, s);
+    this->b = std::stod(s);
+    getline(infile, s);
+    this->point_num = std::stod(s);
+    getline(infile, s);
+    this->x_err = std::stod(s);
+    getline(infile, s);
+    this->y_err = std::stod(s);
+    getline(infile, s);
+    this->min_x = std::stod(s);
+    getline(infile, s);
+    this->max_x = std::stod(s);
+
+    for (int i = 0; i < 4; ++i) {
+        getline(infile, s);
+        this->cutoff.push_back(std::stod(s));
+    }
+
+
     infile.close();
 }
 

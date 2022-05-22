@@ -150,7 +150,8 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
 // create graph and assign data to it:
     QCustomPlot *custom_plot = new QCustomPlot();
     custom_plot->addGraph();
-    custom_plot->graph(0)->setData(x, y_original);
+//    custom_plot->graph(0)->setData(x, y_original);
+//    custom_plot->graph(0)->setPen(QPen(Qt::blue));
     custom_plot->addGraph();
     custom_plot->graph(1)->setData(x, y_approx);
     custom_plot->graph(1)->setPen(QPen(Qt::red));
@@ -229,6 +230,41 @@ void MainWindow::handle_task() {
     tbb::tick_count end_time = tbb::tick_count::now();
     render_window(input_handler, points, (end_time - start_time));
     std::cout << task_parallel_regression.a << "," << task_parallel_regression.b << std::endl;
+}
+
+void MainWindow::file_test() {
+    std::ifstream infile;
+    infile.open("../data/file_test");
+
+    if (!infile.is_open()) {
+        std::cout << "Couldn't open file " << INPUT_FILE << std::endl;
+        std::exit(-2);
+    }
+    std::string s;
+    getline(infile, s);
+    int is_file = std::stod(s);
+    if (is_file ==0){
+        this->show();
+        return;
+    }
+    else{
+        this->input_points->setValue(input_handler.point_num);
+        this->input_y_err->setValue(input_handler.y_err);
+        this->input_x_err->setValue(input_handler.x_err);
+        this->input_x_max->setValue(input_handler.max_x);
+        this->input_x_min->setValue(input_handler.min_x);
+
+        this->handle_serial();
+        this->handle_for();
+
+        for(auto i:input_handler.cutoff){
+            task_parallel_regression.cutoff = i;
+            this->handle_task();
+        }
+
+
+    }
+
 }
 
 

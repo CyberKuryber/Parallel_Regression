@@ -3,7 +3,8 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    MainWindow mainWindow("Main Window");
-    mainWindow.show();
+    MainWindow main_window("Main Window");
+//    main_window.show();
+    main_window.file_test();
     return QApplication::exec();
 }

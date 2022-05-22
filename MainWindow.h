@@ -32,6 +32,8 @@ public:
 
     void generate_points();
 
+    void file_test();
+
 //     ~MainWindow();
 
 
