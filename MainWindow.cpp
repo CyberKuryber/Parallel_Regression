@@ -91,10 +91,11 @@ tbb::concurrent_vector<double> uniform_dots(double x_min, double x_max, double c
     return x;
 }
 
-void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb::tick_count::interval_t timer) {
+void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb::tick_count::interval_t timer,
+                   std::string decoration) {
     /**
      * Renders window with graph of approximated and exact linear functions
-     * @param values Input handler class with parsed parameters, vector of approximated points, how much time approximation lasted
+     * @param values Input handler class with parsed parameters, vector of approximated , how much time approximation lasted
      * */
     QVector<double> x, y_original, y_approx; // initialize with entries 0..100
     for (auto i = points.begin(); i != points.end(); i++) {
@@ -124,6 +125,7 @@ void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb:
     QWidget *widget = new QWidget();
     QGridLayout *layout = new QGridLayout();
     std::string s = "Time: " + std::to_string(timer.seconds() * 1000) + "ms";
+    s = decoration+ " " + s;
     QLabel *label = new QLabel(s.c_str());
     layout->addWidget(custom_plot, 0, 0);
     layout->addWidget(label, 1, 0);
@@ -134,11 +136,13 @@ void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb:
 }
 
 void
-render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer) {
+render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points, tbb::tick_count::interval_t timer,
+              std::string decoration) {
     /**
  * Renders window with graph of approximated and exact linear functions
- * @param values Input handler class with parsed parameters, concurrent_vector of approximated points, how much time approximation lasted
+ * @param values Input handler class with parsed parameters, concurrent_vector of approximated points, how much time  lasted
  * */
+
     QVector<double> x, y_original, y_approx; // initialize with entries 0..100
     for (auto i = points.begin(); i != points.end(); i++) {
         x.push_back(i->get_x());
@@ -168,13 +172,13 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
     QWidget *widget = new QWidget();
     QGridLayout *layout = new QGridLayout();
     std::string s = "Time: " + std::to_string(timer.seconds() * 1000) + "ms";
+    s = decoration + " " + s;
     QLabel *label = new QLabel(s.c_str());
     layout->addWidget(custom_plot, 0, 0);
     layout->addWidget(label, 1, 0);
     widget->setLayout(layout);
     widget->resize(1000, 1000);
     widget->show();
-
 }
 
 
@@ -188,7 +192,7 @@ void MainWindow::handle_serial() {
     serial_linear_regression.calculate_Function(generated_points);
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time));
+    render_window(input_handler, points, (end_time - start_time), "Serial ");
     std::cout << serial_linear_regression.a << "," << serial_linear_regression.b << std::endl;
     // generate some data:
 
@@ -206,12 +210,12 @@ void MainWindow::handle_for() {
     for_parallel_regression.calculate_Function(generated_points);
     tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time));
+    render_window(input_handler, points, (end_time - start_time), "Reduce ");
     std::cout << for_parallel_regression.a << "," << for_parallel_regression.b << std::endl;
 }
 
 void MainWindow::generate_points() {
-    if (generated_points.size() != 0 && generated_points.size() ==input_points->value()) return;
+    if (generated_points.size() != 0 && generated_points.size() == input_points->value()) return;
     this->generated_points = input_handler.generate_dots
             (input_x_min->value(), input_x_max->value(), input_x_err->value(), input_y_err->value(),
              input_points->value());
@@ -228,7 +232,8 @@ void MainWindow::handle_task() {
     task_parallel_regression.calculate_Function(generated_points);
     tbb::concurrent_vector<Point> points = task_parallel_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time));
+    render_window(input_handler, points, (end_time - start_time),
+                  "Task  Group cutoff: " + std::to_string(task_parallel_regression.cutoff));
     std::cout << task_parallel_regression.a << "," << task_parallel_regression.b << std::endl;
 }
 
@@ -243,11 +248,10 @@ void MainWindow::file_test() {
     std::string s;
     getline(infile, s);
     int is_file = std::stod(s);
-    if (is_file ==0){
+    if (is_file == 0) {
         this->show();
         return;
-    }
-    else{
+    } else {
         this->input_points->setValue(input_handler.point_num);
         this->input_y_err->setValue(input_handler.y_err);
         this->input_x_err->setValue(input_handler.x_err);
@@ -257,7 +261,7 @@ void MainWindow::file_test() {
         this->handle_serial();
         this->handle_for();
 
-        for(auto i:input_handler.cutoff){
+        for (auto i: input_handler.cutoff) {
             task_parallel_regression.cutoff = i;
             this->handle_task();
         }

@@ -18,6 +18,7 @@
 #include "tbb/tick_count.h"
 #include "iostream"
 #include "TaskParallelRegression.h"
+#include <string.h>
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
