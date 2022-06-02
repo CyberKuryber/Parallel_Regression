@@ -18,7 +18,7 @@ find_package(Qt5 COMPONENTS
         PrintSupport
         REQUIRED)
 
-add_executable(Parallel_regression main.cpp Point.cpp Point.h InputHandler.cpp InputHandler.h SerialLinearRegression.cpp SerialLinearRegression.h MainWindow.cpp MainWindow.h qcustomplot.cpp qcustomplot.h ForParallelRegression.cpp ForParallelRegression.h TaskParallelRegression.cpp TaskParallelRegression.h)
+add_executable(Parallel_regression main.cpp Point.cpp Point.h InputHandler.cpp InputHandler.h SerialLinearRegression.cpp SerialLinearRegression.h MainWindow.cpp MainWindow.h qcustomplot.cpp qcustomplot.h ForParallelRegression.cpp ForParallelRegression.h TaskParallelRegression.cpp TaskParallelRegression.h SerialLinearRegressionSTL.cpp SerialLinearRegressionSTL.h TaskParallelRegressionSTL.cpp TaskParallelRegressionSTL.h ForParallelRegressionSTL.cpp ForParallelRegressionSTL.h)
 target_link_libraries(Parallel_regression
         Qt5::Core
         Qt5::Gui
