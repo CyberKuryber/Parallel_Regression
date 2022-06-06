@@ -65,12 +65,10 @@ MainWindow::MainWindow(const QString &title) {
     this->setCentralWidget(wdg);
     this->resize(300, 100);
 
-    input_handler.parse_input();
 
-
-    connect(button_serial, &QPushButton::released, this, &MainWindow::handle_serial);
-    connect(button_for, &QPushButton::released, this, &MainWindow::handle_for);
-    connect(button_task, &QPushButton::released, this, &MainWindow::handle_task);
+    connect(button_serial, &QPushButton::released, this, &MainWindow::handle_concurrent_serial);
+    connect(button_for, &QPushButton::released, this, &MainWindow::handle_concurrent_for);
+    connect(button_task, &QPushButton::released, this, &MainWindow::handle_concurrent_task);
 }
 
 std::vector<double> uniform_dots(double x_min, double x_max, double count) {
@@ -125,7 +123,7 @@ void render_window(InputHandler &input_handler, std::vector<Point> &points, tbb:
     QWidget *widget = new QWidget();
     QGridLayout *layout = new QGridLayout();
     std::string s = "Time: " + std::to_string(timer.seconds() * 1000) + "ms";
-    s = decoration+ " " + s;
+    s = decoration + " " + s;
     QLabel *label = new QLabel(s.c_str());
     layout->addWidget(custom_plot, 0, 0);
     layout->addWidget(label, 1, 0);
@@ -154,8 +152,8 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
 // create graph and assign data to it:
     QCustomPlot *custom_plot = new QCustomPlot();
     custom_plot->addGraph();
-//    custom_plot->graph(0)->setData(x, y_original);
-//    custom_plot->graph(0)->setPen(QPen(Qt::blue));
+    custom_plot->graph(0)->setData(x, y_original);
+    custom_plot->graph(0)->setPen(QPen(Qt::cyan));
     custom_plot->addGraph();
     custom_plot->graph(1)->setData(x, y_approx);
     custom_plot->graph(1)->setPen(QPen(Qt::red));
@@ -182,7 +180,7 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
 }
 
 
-void MainWindow::handle_serial() {
+void MainWindow::handle_concurrent_serial() {
     // handle function for serial button
 
     this->generate_points();
@@ -192,14 +190,14 @@ void MainWindow::handle_serial() {
     serial_linear_regression.calculate_Function(generated_points);
     std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time), "Serial ");
+    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time), "Concurrent Serial ");
     std::cout << serial_linear_regression.a << "," << serial_linear_regression.b << std::endl;
     // generate some data:
 
 
 }
 
-void MainWindow::handle_for() {
+void MainWindow::handle_concurrent_for() {
     // handle function for parallel_for button
 
     this->generate_points();
@@ -210,7 +208,7 @@ void MainWindow::handle_for() {
     for_parallel_regression.calculate_Function(generated_points);
     tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time), "Reduce ");
+    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time), "Concurrent Reduce ");
     std::cout << for_parallel_regression.a << "," << for_parallel_regression.b << std::endl;
 }
 
@@ -221,7 +219,7 @@ void MainWindow::generate_points() {
              input_points->value());
 }
 
-void MainWindow::handle_task() {
+void MainWindow::handle_concurrent_task() {
     // handle function for task parallel button
 
     this->generate_points();
@@ -232,8 +230,8 @@ void MainWindow::handle_task() {
     task_parallel_regression.calculate_Function(generated_points);
     tbb::concurrent_vector<Point> points = task_parallel_regression.calculate_points(x_uniform);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, points, (end_time - start_time),
-                  "Task  Group cutoff: " + std::to_string(task_parallel_regression.cutoff));
+    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time),
+                  "Concurrent Task  Group cutoff: " + std::to_string(task_parallel_regression.cutoff));
     std::cout << task_parallel_regression.a << "," << task_parallel_regression.b << std::endl;
 }
 
@@ -252,22 +250,35 @@ void MainWindow::file_test() {
         this->show();
         return;
     } else {
+        input_handler.parse_input(s);
         this->input_points->setValue(input_handler.point_num);
         this->input_y_err->setValue(input_handler.y_err);
         this->input_x_err->setValue(input_handler.x_err);
         this->input_x_max->setValue(input_handler.max_x);
         this->input_x_min->setValue(input_handler.min_x);
 
-        this->handle_serial();
-        this->handle_for();
+        this->handle_concurrent_serial();
+        this->handle_concurrent_for();
 
         for (auto i: input_handler.cutoff) {
             task_parallel_regression.cutoff = i;
-            this->handle_task();
+            this->handle_concurrent_task();
         }
 
 
     }
+
+}
+
+void MainWindow::handle_stl_serial() {
+
+}
+
+void MainWindow::handle_stl_for() {
+
+}
+
+void MainWindow::handle_stl_task() {
 
 }
 

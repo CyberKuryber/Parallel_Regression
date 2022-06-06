@@ -25,11 +25,17 @@ Q_OBJECT
 public:
     MainWindow(const QString &title);
 
-    void handle_serial();
+    void handle_concurrent_serial();
 
-    void handle_for();
+    void handle_concurrent_for();
 
-    void handle_task();
+    void handle_concurrent_task();
+
+    void handle_stl_serial();
+
+    void handle_stl_for();
+
+    void handle_stl_task();
 
     void generate_points();
 

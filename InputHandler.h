@@ -24,17 +24,22 @@ private:
     double b;
 
 public:
-    void parse_input();
+    tbb::concurrent_vector<Point> concurrent_points;
+    std::vector<Point> stl_points;
+
+    void parse_input(std::string s);
 
     double calculate_original(double x) const;
 
     tbb::concurrent_vector<Point> generate_dots(double x_min, double x_max, double x_error, double y_error, int ponts);
-    long point_num =0;
-    int x_err =0;
-    int y_err =0;
-    int min_x =0;
-    int max_x =0;
+
+    long point_num = 0;
+    int x_err = 0;
+    int y_err = 0;
+    int min_x = 0;
+    int max_x = 0;
     std::vector<int> cutoff;
+
 
 };
 

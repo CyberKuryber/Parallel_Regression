@@ -4,40 +4,48 @@
 
 #include "InputHandler.h"
 
-void InputHandler::parse_input() {
+void InputHandler::parse_input(std::string s) {
     /**
 *Parse parameters of linear function from file
 */
     std::ifstream infile;
-    infile.open(INPUT_FILE);
+    infile.open(INPUT_FILE + s);
 
     if (!infile.is_open()) {
         std::cout << "Couldn't open file " << INPUT_FILE << std::endl;
         std::exit(-2);
     }
 
-    std::string s;
+    std::string line;
     std::string delimiter = "|";
-    getline(infile, s);
-    this->a = std::stod(s);
-    getline(infile, s);
-    this->b = std::stod(s);
-    getline(infile, s);
-    this->point_num = std::stod(s);
-    getline(infile, s);
-    this->x_err = std::stod(s);
-    getline(infile, s);
-    this->y_err = std::stod(s);
-    getline(infile, s);
-    this->min_x = std::stod(s);
-    getline(infile, s);
-    this->max_x = std::stod(s);
+    getline(infile, line);
+    this->a = std::stod(line);
+    getline(infile, line);
+    this->b = std::stod(line);
+    getline(infile, line);
+    this->point_num = std::stod(line);
+    getline(infile, line);
+    this->x_err = std::stod(line);
+    getline(infile, line);
+    this->y_err = std::stod(line);
+    getline(infile, line);
+    this->min_x = std::stod(line);
+    getline(infile, line);
+    this->max_x = std::stod(line);
 
     for (int i = 0; i < 4; ++i) {
-        getline(infile, s);
-        this->cutoff.push_back(std::stod(s));
+        getline(infile, line);
+        this->cutoff.push_back(std::stod(line));
     }
 
+    for (int i = 0; i < point_num; ++i) {
+        getline(infile, line);
+        double x = std::stod(line);
+        getline(infile, line);
+        double y = std::stod(line);
+        stl_points.push_back(Point(x,y));
+        concurrent_points.push_back(Point(x,y));
+    }
 
     infile.close();
 }
@@ -72,6 +80,7 @@ struct Shaker {
                                                                                    x_error(x_error),
                                                                                    y_error(y_error) {};
 };
+
 
 
 tbb::concurrent_vector<Point>
