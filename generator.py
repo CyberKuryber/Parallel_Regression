@@ -31,10 +31,11 @@ for i in range(1, 5):
     input_file.write(str(points_num) + "\n" + str(x_err) + "\n" + str(y_err) + "\n" + str(0) + "\n" + str(5))
 
     for j in range(1, 5):
-        cutoff = points_num // pow(2, i)
+        cutoff = points_num // pow(2, j)
         input_file.write("\n" + str(cutoff))
 
     x = np.linspace(0, 5, points_num)
+    x = x+ (random.random()*2 -1)*x_err/100 *x
     f = lambda x: a * x + b
     y = f(x)
 

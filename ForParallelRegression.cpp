@@ -5,7 +5,7 @@
 #include "ForParallelRegression.h"
 
 
-struct FunctionCalculator {
+struct FunctionCalculatorPF {
     /**struct that enables usage of parallel reduce;
       @param uses previously generated points
      */
@@ -21,19 +21,19 @@ struct FunctionCalculator {
         }
     }
 
-    void join(const FunctionCalculator &functionCalculator) {
-        x_sum += functionCalculator.x_sum;
-        y_sum += functionCalculator.y_sum;
-        x2_sum += functionCalculator.x2_sum;
-        x_ysum += functionCalculator.x_ysum;
+    void join(const FunctionCalculatorPF &functionCalculatorPF) {
+        x_sum += functionCalculatorPF.x_sum;
+        y_sum += functionCalculatorPF.y_sum;
+        x2_sum += functionCalculatorPF.x2_sum;
+        x_ysum += functionCalculatorPF.x_ysum;
     }
 
-    FunctionCalculator(FunctionCalculator &functionCalculator, tbb::split) : points(functionCalculator.points) {};
+    FunctionCalculatorPF(FunctionCalculatorPF &functionCalculatorPF, tbb::split) : points(functionCalculatorPF.points) {};
 
-    FunctionCalculator(tbb::concurrent_vector<Point> &points) : points(points) {};
+    FunctionCalculatorPF(tbb::concurrent_vector<Point> &points) : points(points) {};
 };
 
-struct PointsCalculator {
+struct PointsCalculatorPF {
     /**struct that enables to calculate uniform points using parallel for
   @param uses previously generated points and uniformly distributed points on x axis
  */
@@ -47,7 +47,7 @@ struct PointsCalculator {
         }
     }
 
-    PointsCalculator(tbb::concurrent_vector<Point> &points, tbb::concurrent_vector<double> &x, double a, double b)
+    PointsCalculatorPF(tbb::concurrent_vector<Point> &points, tbb::concurrent_vector<double> &x, double a, double b)
             : points(points), x(x), a(a), b(b) {};
 };
 
@@ -66,12 +66,12 @@ void ForParallelRegression::calculate_Function(tbb::concurrent_vector<Point> &po
 */
 
     int n = points.size();
-    FunctionCalculator functionCalculator(points);
-    tbb::parallel_reduce(tbb::blocked_range<int>(0, n), functionCalculator);
-    double x_ysum = functionCalculator.x_ysum;
-    double x_sum = functionCalculator.x_sum;
-    double x2_sum = functionCalculator.x2_sum;
-    double y_sum = functionCalculator.y_sum;
+    FunctionCalculatorPF functionCalculatorPF(points);
+    tbb::parallel_reduce(tbb::blocked_range<int>(0, n), functionCalculatorPF);
+    double x_ysum = functionCalculatorPF.x_ysum;
+    double x_sum = functionCalculatorPF.x_sum;
+    double x2_sum = functionCalculatorPF.x2_sum;
+    double y_sum = functionCalculatorPF.y_sum;
 
     this->a = (n * x_ysum - x_sum * y_sum) / (n * x2_sum - x_sum * x_sum);
     this->b = (x2_sum * y_sum - x_sum * x_ysum) / (x2_sum * n - x_sum * x_sum);
@@ -85,8 +85,8 @@ tbb::concurrent_vector<Point> ForParallelRegression::calculate_points(tbb::concu
 * @return Points of approximated function calculated using param and previously calculated linear function params
 */
     tbb::concurrent_vector<Point> points;
-    PointsCalculator pointsCalculator(points, x, a, b);
-    tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculator);
+    PointsCalculatorPF pointsCalculatorPF(points, x, a, b);
+    tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculatorPF);
 
   //  tbb::parallel_sort(points, less_than_point());
 

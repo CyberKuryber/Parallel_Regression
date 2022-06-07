@@ -4,7 +4,7 @@
 
 #include "TaskParallelRegression.h"
 
-struct PointsCalculator {
+ struct PointsCalculatorT {
     /**struct that enables to calculate uniform points using parallel for
   @param uses previously generated points and uniformly distributed points on x axis
  */
@@ -18,7 +18,7 @@ struct PointsCalculator {
         }
     }
 
-    PointsCalculator(tbb::concurrent_vector<Point> &points, tbb::concurrent_vector<double> &x, double a, double b)
+    PointsCalculatorT(tbb::concurrent_vector<Point> &points, tbb::concurrent_vector<double> &x, double a, double b)
             : points(points), x(x), a(a), b(b) {};
 };
 
@@ -46,8 +46,8 @@ tbb::concurrent_vector<Point> TaskParallelRegression::calculate_points(tbb::conc
 * @return Points of approximated function calculated using param and previously calculated linear function params
 */
     tbb::concurrent_vector<Point> points;
-    PointsCalculator pointsCalculator(points, x, a, b);
-    tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculator);
+    PointsCalculatorT pointsCalculatorT(points, x, a, b);
+    tbb::parallel_for(tbb::blocked_range<int>(0, x.size()), pointsCalculatorT);
     return points;
 }
 

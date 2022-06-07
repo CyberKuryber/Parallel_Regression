@@ -183,14 +183,14 @@ render_window(InputHandler &input_handler, tbb::concurrent_vector<Point> &points
 void MainWindow::handle_concurrent_serial() {
     // handle function for serial button
 
-    this->generate_points();
+//    this->generate_points();
 
-    std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
+//    std::vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(), input_points->value());
     tbb::tick_count start_time = tbb::tick_count::now();
-    serial_linear_regression.calculate_Function(generated_points);
-    std::vector<Point> points = serial_linear_regression.calculate_points(x_uniform);
+    serial_linear_regression.calculate_Function(input_handler.concurrent_points);
+    std::vector<Point> points = serial_linear_regression.calculate_points(input_handler.stl_x);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time), "Concurrent Serial ");
+    render_window(input_handler, points, (end_time - start_time), "Concurrent Serial ");
     std::cout << serial_linear_regression.a << "," << serial_linear_regression.b << std::endl;
     // generate some data:
 
@@ -200,15 +200,15 @@ void MainWindow::handle_concurrent_serial() {
 void MainWindow::handle_concurrent_for() {
     // handle function for parallel_for button
 
-    this->generate_points();
+//    this->generate_points();
 
-    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
-                                                            input_points->value(), true);
+//    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
+//                                                            input_points->value(), true);
     tbb::tick_count start_time = tbb::tick_count::now();
-    for_parallel_regression.calculate_Function(generated_points);
-    tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(x_uniform);
+    for_parallel_regression.calculate_Function(input_handler.concurrent_points);
+    tbb::concurrent_vector<Point> points = for_parallel_regression.calculate_points(input_handler.concurrent_x);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time), "Concurrent Reduce ");
+    render_window(input_handler, points, (end_time - start_time), "Concurrent Reduce ");
     std::cout << for_parallel_regression.a << "," << for_parallel_regression.b << std::endl;
 }
 
@@ -222,15 +222,15 @@ void MainWindow::generate_points() {
 void MainWindow::handle_concurrent_task() {
     // handle function for task parallel button
 
-    this->generate_points();
+//    this->generate_points();
 
-    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
-                                                            input_points->value(), true);
+//    tbb::concurrent_vector<double> x_uniform = uniform_dots(input_x_min->value(), input_x_max->value(),
+//                                                            input_points->value(), true);
     tbb::tick_count start_time = tbb::tick_count::now();
-    task_parallel_regression.calculate_Function(generated_points);
-    tbb::concurrent_vector<Point> points = task_parallel_regression.calculate_points(x_uniform);
+    task_parallel_regression.calculate_Function(input_handler.concurrent_points);
+    tbb::concurrent_vector<Point> points = task_parallel_regression.calculate_points(input_handler.concurrent_x);
     tbb::tick_count end_time = tbb::tick_count::now();
-    render_window(input_handler, input_handler.concurrent_points, (end_time - start_time),
+    render_window(input_handler, points, (end_time - start_time),
                   "Concurrent Task  Group cutoff: " + std::to_string(task_parallel_regression.cutoff));
     std::cout << task_parallel_regression.a << "," << task_parallel_regression.b << std::endl;
 }
@@ -264,22 +264,46 @@ void MainWindow::file_test() {
             task_parallel_regression.cutoff = i;
             this->handle_concurrent_task();
         }
+        std::cout<<"\nSTl\n";
+        this->handle_stl_serial();
+        this->handle_stl_for();
 
+        for (auto i: input_handler.cutoff) {
+            task_parallel_regression_stl.cutoff = i;
+            this->handle_stl_task();
+        }
 
     }
 
 }
 
 void MainWindow::handle_stl_serial() {
-
+    tbb::tick_count start_time = tbb::tick_count::now();
+    serial_linear_regression_stl.calculate_Function(input_handler.stl_points);
+    std::vector<Point> points = serial_linear_regression_stl.calculate_points(input_handler.stl_x);
+    tbb::tick_count end_time = tbb::tick_count::now();
+    render_window(input_handler, points, (end_time - start_time), "STL Serial ");
+    std::cout << serial_linear_regression_stl.a << "," << serial_linear_regression_stl.b << std::endl;
 }
 
 void MainWindow::handle_stl_for() {
+    tbb::tick_count start_time = tbb::tick_count::now();
+    for_parallel_regression_stl.calculate_Function(input_handler.stl_points);
+    std::vector<Point> points = for_parallel_regression_stl.calculate_points(input_handler.stl_x);
+    tbb::tick_count end_time = tbb::tick_count::now();
+    render_window(input_handler, points, (end_time - start_time), "STL Reduce ");
+    std::cout << for_parallel_regression_stl.a << "," << for_parallel_regression_stl.b << std::endl;
 
 }
 
 void MainWindow::handle_stl_task() {
-
+    tbb::tick_count start_time = tbb::tick_count::now();
+    task_parallel_regression_stl.calculate_Function(input_handler.stl_points);
+    std::vector<Point> points = task_parallel_regression_stl.calculate_points(input_handler.stl_x);
+    tbb::tick_count end_time = tbb::tick_count::now();
+    render_window(input_handler, points, (end_time - start_time),
+                  "STL Task  Group cutoff: " + std::to_string(task_parallel_regression_stl.cutoff));
+    std::cout << task_parallel_regression_stl.a << "," << task_parallel_regression_stl.b << std::endl;
 }
 
 

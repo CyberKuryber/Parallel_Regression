@@ -26,6 +26,9 @@ private:
 public:
     tbb::concurrent_vector<Point> concurrent_points;
     std::vector<Point> stl_points;
+    tbb::concurrent_vector<double> concurrent_x;
+    std::vector<double> stl_x;
+
 
     void parse_input(std::string s);
 

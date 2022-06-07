@@ -15,6 +15,7 @@
 
 
 class TaskParallelRegressionSTL {
+public:
     void calculate_Function(std::vector<Point> &points);
 
     std::vector<Point> calculate_points(std::vector<double> &x);

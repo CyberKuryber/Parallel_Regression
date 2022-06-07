@@ -43,8 +43,10 @@ void InputHandler::parse_input(std::string s) {
         double x = std::stod(line);
         getline(infile, line);
         double y = std::stod(line);
-        stl_points.push_back(Point(x,y));
-        concurrent_points.push_back(Point(x,y));
+        stl_points.push_back(Point(x, y));
+        concurrent_points.push_back(Point(x, y));
+        stl_x.push_back(x);
+        concurrent_x.push_back(x);
     }
 
     infile.close();
@@ -80,7 +82,6 @@ struct Shaker {
                                                                                    x_error(x_error),
                                                                                    y_error(y_error) {};
 };
-
 
 
 tbb::concurrent_vector<Point>

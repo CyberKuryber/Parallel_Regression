@@ -19,6 +19,9 @@
 #include "iostream"
 #include "TaskParallelRegression.h"
 #include <string.h>
+#include "ForParallelRegressionSTL.h"
+#include "SerialLinearRegressionSTL.h"
+#include "TaskParallelRegressionSTL.h"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -64,6 +67,9 @@ private:
     ForParallelRegression for_parallel_regression;
     TaskParallelRegression task_parallel_regression;
     tbb::concurrent_vector<Point> generated_points;
+    SerialLinearRegressionSTL serial_linear_regression_stl;
+    ForParallelRegressionSTL for_parallel_regression_stl;
+    TaskParallelRegressionSTL task_parallel_regression_stl;
 
 };
 
